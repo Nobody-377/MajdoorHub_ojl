@@ -17,12 +17,12 @@ export default function SignupQuestions({ navigation, route }) {
   const [selectedCity, setSelectedCity] = useState('');
 
   // Worker-specific states
-  const [skill, setSkill] = useState('Plumber');
+  const [skill, setSkill] = useState('');
   const [customSkill, setCustomSkill] = useState('');
-  const [hourlyRate, setHourlyRate] = useState('400');
-  const [dailyRate, setDailyRate] = useState('1200');
+  const [hourlyRate, setHourlyRate] = useState('');
+  const [dailyRate, setDailyRate] = useState('');
   const [experience, setExperience] = useState('');
-  const [availability, setAvailability] = useState('Full-time');
+  const [availability, setAvailability] = useState('');
 
   // Customer-specific states
   const [preferredCategories, setPreferredCategories] = useState([]);
@@ -67,9 +67,9 @@ export default function SignupQuestions({ navigation, route }) {
   const isButtonDisabled = () => {
     if (role === 'worker') {
       if (step === 1) return name.trim().length === 0;
-      if (step === 2) return skill === 'Other' && customSkill.trim().length === 0;
+      if (step === 2) return skill === '' || (skill === 'Other' && customSkill.trim().length === 0);
       if (step === 3) return !experience; // Require user to select an experience option
-      if (step === 4) return false; // Availability is pre-selected
+      if (step === 4) return !availability; // Require user to select an availability option
       if (step === 5) return hourlyRate.trim().length === 0 || dailyRate.trim().length === 0;
       if (step === 6) return !selectedCity;
       return false; // Step 7 (Email) is optional
