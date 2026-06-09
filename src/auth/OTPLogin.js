@@ -58,6 +58,7 @@ export default function OTPLogin({ navigation }) {
               <TextInput
                 style={styles.input}
                 placeholder="00000 00000"
+                placeholderTextColor={colors.textLight}
                 keyboardType="phone-pad"
                 maxLength={10}
                 value={phone}
@@ -92,6 +93,7 @@ export default function OTPLogin({ navigation }) {
               <TextInput
                 style={[styles.input, { paddingLeft: 16, letterSpacing: 8, fontSize: 24 }]}
                 placeholder="0000"
+                placeholderTextColor={colors.textLight}
                 keyboardType="number-pad"
                 maxLength={4}
                 value={otp}
