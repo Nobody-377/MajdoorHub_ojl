@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, TextInput, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, TextInput, Alert, Platform } from 'react-native';
+import useStore from '../store/useStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search, MapPin, Bell, Star, Wrench, Zap, PaintRoller, Hammer } from 'lucide-react-native';
@@ -19,9 +20,23 @@ const NEARBY_WORKERS = [
 
 export default function CustomerHome({ navigation }) {
   const insets = useSafeAreaInsets();
-  const [currentLocation, setCurrentLocation] = useState('Andheri West, Mumbai');
+  const { user, setUser } = useStore();
+  const [currentLocation, setCurrentLocation] = useState(user?.location || 'Andheri West, Mumbai');
   const [locationModalVisible, setLocationModalVisible] = useState(false);
   const [tempLocation, setTempLocation] = useState(currentLocation);
+
+  useEffect(() => {
+    if (user?.location) {
+      setCurrentLocation(user.location);
+    }
+  }, [user?.location]);
+
+  const handleSaveLocation = (newLoc) => {
+    setCurrentLocation(newLoc);
+    if (user && setUser) {
+      setUser({ ...user, location: newLoc });
+    }
+  };
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView 
@@ -168,7 +183,7 @@ export default function CustomerHome({ navigation }) {
                 <TouchableOpacity 
                   key={loc} 
                   style={styles.suggestionBtn} 
-                  onPress={() => { setCurrentLocation(loc); setLocationModalVisible(false); }}
+                  onPress={() => { handleSaveLocation(loc); setLocationModalVisible(false); }}
                 >
                   <Text style={styles.suggestionBtnText}>{loc.split(',')[0]}</Text>
                 </TouchableOpacity>
@@ -178,7 +193,7 @@ export default function CustomerHome({ navigation }) {
               style={styles.saveLocationBtn}
               onPress={() => {
                 if (tempLocation.trim()) {
-                  setCurrentLocation(tempLocation);
+                  handleSaveLocation(tempLocation.trim());
                   setLocationModalVisible(false);
                 }
               }}
@@ -444,6 +459,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
     marginBottom: 20,
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+      },
+    }),
   },
   suggestionsTitle: {
     fontSize: 13,
