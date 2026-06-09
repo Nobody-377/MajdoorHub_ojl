@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Camera, LogOut } from 'lucide-react-native';
 import colors from '../utils/colors';
@@ -143,7 +143,21 @@ const styles = StyleSheet.create({
   changePhoto: { color: colors.accent, fontWeight: 'bold', marginTop: 12 },
   inputGroup: { marginBottom: 20 },
   label: { fontSize: 14, fontWeight: '600', color: colors.textSecondary, marginBottom: 8 },
-  input: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 16, height: 50, fontSize: 15, color: colors.text },
+  input: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    height: 50,
+    fontSize: 15,
+    color: colors.text,
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+      },
+    }),
+  },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', color: colors.text, marginTop: 10, marginBottom: 16 },
   priceRow: { flexDirection: 'row', gap: 16 },
   saveBtn: { backgroundColor: colors.accent, paddingVertical: 18, borderRadius: 16, alignItems: 'center', marginTop: 16 },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Switch, Alert, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LogOut, User, MapPin, CreditCard, HelpCircle, Shield, Share2, ChevronRight, Edit3, X, Save, Plus, Key, RefreshCw, Trash2, Smartphone } from 'lucide-react-native';
 import colors from '../utils/colors';
@@ -674,6 +674,11 @@ const styles = StyleSheet.create({
     height: 50,
     fontSize: 15,
     color: colors.text,
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+      },
+    }),
   },
   primaryBtn: {
     flexDirection: 'row',

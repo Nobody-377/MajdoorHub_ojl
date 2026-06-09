@@ -166,6 +166,11 @@ const styles = StyleSheet.create({
     height: '100%',
     fontSize: 18,
     color: colors.text,
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+      },
+    }),
   },
   button: {
     backgroundColor: colors.accent,

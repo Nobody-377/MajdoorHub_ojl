@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, Calendar as CalendarIcon, Clock, MapPin, CheckCircle2 } from 'lucide-react-native';
 import colors from '../utils/colors';
@@ -119,10 +119,37 @@ const styles = StyleSheet.create({
   workerSkill: { fontSize: 14, color: colors.textSecondary },
   inputGroup: { marginBottom: 20 },
   label: { fontSize: 14, fontWeight: '600', color: colors.textSecondary, marginBottom: 8 },
-  input: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 16, height: 50, fontSize: 15 },
+  input: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    height: 50,
+    fontSize: 15,
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+      },
+    }),
+  },
   inputWithIcon: { position: 'relative' },
   iconPos: { position: 'absolute', left: 16, top: 15, zIndex: 1 },
-  inputPadded: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 12, paddingLeft: 44, paddingRight: 16, height: 50, fontSize: 15 },
+  inputPadded: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingLeft: 44,
+    paddingRight: 16,
+    height: 50,
+    fontSize: 15,
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+      },
+    }),
+  },
   uploadBox: { height: 100, borderStyle: 'dashed', borderWidth: 2, borderColor: colors.border, borderRadius: 12, backgroundColor: '#F9FAFB', alignItems: 'center', justifyContent: 'center' },
   uploadText: { color: colors.textLight, fontSize: 14 },
   primaryBtn: { backgroundColor: colors.accent, paddingVertical: 18, borderRadius: 16, alignItems: 'center', marginTop: 16, width: '100%' },

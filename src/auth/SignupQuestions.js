@@ -459,6 +459,11 @@ const styles = StyleSheet.create({
     height: '100%',
     fontSize: 16,
     color: colors.text,
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+      },
+    }),
   },
   citiesGrid: {
     flexDirection: 'row',
