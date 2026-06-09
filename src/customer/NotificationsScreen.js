@@ -32,7 +32,7 @@ const NOTIFICATIONS = [
     id: 'n3',
     title: 'Huge Discount: 20% Off! 🎁',
     shortDesc: 'Exclusive discount code for your next home service booking.',
-    fullDesc: 'Welcome to MazdoorHub! We are excited to offer you a special 20% discount on your next electrician, plumber, or painter booking. Use code MAZDOOR20 during checkout. This offer is valid till June 15, 2026, for a maximum discount of ₹150. Claim it today and hire high-quality verified labor!',
+    fullDesc: 'Welcome to MajdoorHub! We are excited to offer you a special 20% discount on your next electrician, plumber, or painter booking. Use code MAZDOOR20 during checkout. This offer is valid till June 15, 2026, for a maximum discount of ₹150. Claim it today and hire high-quality verified labor!',
     date: '1 day ago',
     type: 'offer',
     read: true,

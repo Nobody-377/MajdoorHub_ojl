@@ -359,7 +359,7 @@ export default function ProfileScreen() {
             <Text style={[styles.subSectionTitle, { marginTop: 28, color: colors.danger }]}>Danger Zone</Text>
             <View style={styles.dangerZoneCard}>
               <Text style={styles.dangerTitle}>Deactivate or Delete Account</Text>
-              <Text style={styles.dangerSub}>Permanently delete all your bookings, active jobs, and personal files from MazdoorHub.</Text>
+              <Text style={styles.dangerSub}>Permanently delete all your bookings, active jobs, and personal files from MajdoorHub.</Text>
               <TouchableOpacity style={styles.deleteBtnDanger} onPress={handleDeleteAccount}>
                 <Trash2 size={16} color={colors.danger} />
                 <Text style={styles.deleteTextDanger}>Delete Account Permanently</Text>

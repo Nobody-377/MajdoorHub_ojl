@@ -116,7 +116,7 @@ export default function SignupQuestions({ navigation, route }) {
           <View style={styles.stepContainer}>
             <View style={styles.header}>
               <Text style={styles.title}>What is your name? 👤</Text>
-              <Text style={styles.subtitle}>Enter your full name so others can identify you on MazdoorHub.</Text>
+              <Text style={styles.subtitle}>Enter your full name so others can identify you on MajdoorHub.</Text>
             </View>
 
             <View style={styles.inputContainer}>

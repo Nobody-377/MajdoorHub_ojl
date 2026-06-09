@@ -43,7 +43,7 @@ export default function RoleSelection({ navigation, route }) {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.title}>Who are you?</Text>
-          <Text style={styles.subtitle}>Choose how you want to use MazdoorHub</Text>
+          <Text style={styles.subtitle}>Choose how you want to use MajdoorHub</Text>
         </View>
 
         <View style={styles.options}>

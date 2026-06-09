@@ -6,9 +6,9 @@ import { getStorage } from 'firebase/storage';
 // Replace these with your actual Firebase project configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDummyKey-ForDemoPurposeOnly",
-  authDomain: "mazdoorhub-demo.firebaseapp.com",
-  projectId: "mazdoorhub-demo",
-  storageBucket: "mazdoorhub-demo.appspot.com",
+  authDomain: "majdoorhub-demo.firebaseapp.com",
+  projectId: "majdoorhub-demo",
+  storageBucket: "majdoorhub-demo.appspot.com",
   messagingSenderId: "1234567890",
   appId: "1:1234567890:web:abcdef123456"
 };

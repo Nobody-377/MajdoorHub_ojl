@@ -16,7 +16,7 @@ export default function Splash({ navigation }) {
       <View style={styles.iconContainer}>
         <HardHat color={colors.surface} size={64} />
       </View>
-      <Text style={styles.title}>MazdoorHub</Text>
+      <Text style={styles.title}>MajdoorHub</Text>
       <Text style={styles.subtitle}>Build Better. Build Together.</Text>
     </View>
   );

@@ -81,7 +81,7 @@ export default function OTPLogin({ navigation }) {
               activeOpacity={0.7}
             >
               <Text style={styles.toggleText}>
-                {isSignUp ? "Already have an account? " : "New to MazdoorHub? "}
+                {isSignUp ? "Already have an account? " : "New to MajdoorHub? "}
                 <Text style={styles.toggleTextBold}>{isSignUp ? "Log In" : "Sign Up"}</Text>
               </Text>
             </TouchableOpacity>
