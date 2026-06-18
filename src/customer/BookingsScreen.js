@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, ScrollView, Alert, TextInput } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Calendar, Clock, MapPin, X, Phone, RefreshCw, Star, Trash2 } from 'lucide-react-native';
+import { Calendar, Clock, MapPin, X, Phone, RefreshCw, Star, Trash2, CreditCard } from 'lucide-react-native';
 import colors from '../utils/colors';
 import useStore from '../store/useStore';
 
@@ -18,6 +18,7 @@ const MOCK_BOOKINGS = [
     cost: '₹400/hr',
     baseRate: 400,
     problem: 'Bathroom pipe is leaking and causing water logging.',
+    paid: false,
   },
   {
     id: 'MH-7104',
@@ -31,6 +32,7 @@ const MOCK_BOOKINGS = [
     cost: '₹450/hr',
     baseRate: 450,
     problem: 'Living room fan switch not working, needs replacement.',
+    paid: true,
   },
   {
     id: 'MH-5201',
@@ -44,18 +46,20 @@ const MOCK_BOOKINGS = [
     cost: '₹350/hr',
     baseRate: 350,
     problem: 'Bedroom wall requires a touch-up coat of paint.',
+    paid: false,
   }
 ];
 
 export default function BookingsScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const [bookings, setBookings] = useState(MOCK_BOOKINGS);
   const [activeTab, setActiveTab] = useState('All'); // 'All' | 'Active' | 'Completed'
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isReviewVisible, setIsReviewVisible] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
 
-  const filteredBookings = MOCK_BOOKINGS.filter(booking => {
+  const filteredBookings = bookings.filter(booking => {
     if (activeTab === 'All') return true;
     if (activeTab === 'Active') return booking.status === 'In Progress' || booking.status === 'Pending';
     if (activeTab === 'Completed') return booking.status === 'Completed';
@@ -71,6 +75,13 @@ export default function BookingsScreen({ navigation }) {
     return { bg: '#E5E7EB', text: '#4B5563' }; // Grey
   };
 
+  const getPaymentStatusStyle = (paid) => {
+    if (paid) {
+      return { bg: '#D1FAE5', text: '#059669', label: 'Paid' }; // Green
+    }
+    return { bg: '#FEE2E2', text: '#EF4444', label: 'Unpaid' }; // Red
+  };
+
   const handleCancelBooking = (id) => {
     Alert.alert(
       'Cancel Booking',
@@ -83,6 +94,28 @@ export default function BookingsScreen({ navigation }) {
           onPress: () => {
             setSelectedBooking(null);
             Alert.alert('Cancelled', `Booking ${id} has been cancelled successfully.`);
+          }
+        }
+      ]
+    );
+  };
+
+  const handlePayNow = (id) => {
+    Alert.alert(
+      'Confirm Payment',
+      `Do you want to process payment for Booking ${id}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Pay Now', 
+          onPress: () => {
+            setBookings(prevBookings => 
+              prevBookings.map(b => b.id === id ? { ...b, paid: true } : b)
+            );
+            setSelectedBooking(prevSelected => 
+              prevSelected && prevSelected.id === id ? { ...prevSelected, paid: true } : prevSelected
+            );
+            Alert.alert('Payment Successful', `Payment for Booking ${id} was processed successfully!`);
           }
         }
       ]
@@ -124,6 +157,7 @@ export default function BookingsScreen({ navigation }) {
         }
         renderItem={({ item }) => {
           const statusStyle = getStatusStyle(item.status);
+          const paymentStyle = getPaymentStatusStyle(item.paid);
           return (
             <TouchableOpacity 
               style={styles.card} 
@@ -137,10 +171,19 @@ export default function BookingsScreen({ navigation }) {
                   <Text style={styles.workerName}>{item.workerName}</Text>
                   <Text style={styles.workerSkill}>{item.skill}</Text>
                 </View>
-                <View style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}>
-                  <Text style={[styles.statusTextBadge, { color: statusStyle.text }]}>
-                    {item.status}
-                  </Text>
+                <View style={{ gap: 6, alignItems: 'flex-end' }}>
+                  <View style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}>
+                    <Text style={[styles.statusTextBadge, { color: statusStyle.text }]}>
+                      {item.status}
+                    </Text>
+                  </View>
+                  {item.status === 'Completed' && (
+                    <View style={[styles.statusBadge, { backgroundColor: paymentStyle.bg }]}>
+                      <Text style={[styles.statusTextBadge, { color: paymentStyle.text }]}>
+                        {paymentStyle.label}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </View>
 
@@ -163,8 +206,17 @@ export default function BookingsScreen({ navigation }) {
               {/* Card Footer */}
               <View style={styles.divider} />
               <View style={styles.cardFooter}>
-                <Text style={styles.priceLabel}>Estimated Cost</Text>
-                <Text style={styles.priceVal}>{item.cost}</Text>
+                <View>
+                  <Text style={styles.priceLabel}>Estimated Cost</Text>
+                  <Text style={styles.priceVal}>{item.cost}</Text>
+                </View>
+                {item.status === 'Completed' && (
+                  <View style={[styles.statusBadge, { backgroundColor: paymentStyle.bg }]}>
+                    <Text style={[styles.statusTextBadge, { color: paymentStyle.text }]}>
+                      {paymentStyle.label}
+                    </Text>
+                  </View>
+                )}
               </View>
             </TouchableOpacity>
           );
@@ -194,10 +246,19 @@ export default function BookingsScreen({ navigation }) {
                 {/* Status Section */}
                 <View style={styles.statusBox}>
                   <Text style={styles.modalBookingId}>Booking ID: {selectedBooking.id}</Text>
-                  <View style={[styles.statusBadge, { backgroundColor: getStatusStyle(selectedBooking.status).bg, alignSelf: 'flex-start', marginTop: 6 }]}>
-                    <Text style={[styles.statusTextBadge, { color: getStatusStyle(selectedBooking.status).text }]}>
-                      {selectedBooking.status}
-                    </Text>
+                  <View style={{ flexDirection: 'row', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
+                    <View style={[styles.statusBadge, { backgroundColor: getStatusStyle(selectedBooking.status).bg }]}>
+                      <Text style={[styles.statusTextBadge, { color: getStatusStyle(selectedBooking.status).text }]}>
+                        {selectedBooking.status}
+                      </Text>
+                    </View>
+                    {selectedBooking.status === 'Completed' && (
+                      <View style={[styles.statusBadge, { backgroundColor: getPaymentStatusStyle(selectedBooking.paid).bg }]}>
+                        <Text style={[styles.statusTextBadge, { color: getPaymentStatusStyle(selectedBooking.paid).text }]}>
+                          {getPaymentStatusStyle(selectedBooking.paid).label}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 </View>
 
@@ -265,6 +326,17 @@ export default function BookingsScreen({ navigation }) {
                     <Text style={styles.billLabelBold}>Estimated Total</Text>
                     <Text style={styles.billValueBold}>₹{selectedBooking.baseRate + 20 + Math.round(selectedBooking.baseRate * 0.18)}</Text>
                   </View>
+                  {selectedBooking.status === 'Completed' && (
+                    <>
+                      <View style={styles.billDivider} />
+                      <View style={styles.billRow}>
+                        <Text style={styles.billLabelBold}>Payment Status</Text>
+                        <Text style={[styles.billValueBold, { color: getPaymentStatusStyle(selectedBooking.paid).text }]}>
+                          {getPaymentStatusStyle(selectedBooking.paid).label}
+                        </Text>
+                      </View>
+                    </>
+                  )}
                 </View>
 
                 {/* Actions */}
@@ -295,17 +367,27 @@ export default function BookingsScreen({ navigation }) {
                         <RefreshCw size={20} color={colors.surface} />
                         <Text style={styles.callButtonText}>Book Again</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity 
-                        style={styles.reviewButton}
-                        onPress={() => {
-                          setReviewRating(0);
-                          setReviewText('');
-                          setIsReviewVisible(true);
-                        }}
-                      >
-                        <Star size={18} color={colors.accent} fill={colors.accent} />
-                        <Text style={styles.reviewButtonText}>Write a Review</Text>
-                      </TouchableOpacity>
+                      {selectedBooking.paid ? (
+                        <TouchableOpacity 
+                          style={styles.reviewButton}
+                          onPress={() => {
+                            setReviewRating(0);
+                            setReviewText('');
+                            setIsReviewVisible(true);
+                          }}
+                        >
+                          <Star size={18} color={colors.accent} fill={colors.accent} />
+                          <Text style={styles.reviewButtonText}>Write a Review</Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity 
+                          style={styles.payButton}
+                          onPress={() => handlePayNow(selectedBooking.id)}
+                        >
+                          <CreditCard size={20} color={colors.surface} />
+                          <Text style={styles.payButtonText}>Pay Now</Text>
+                        </TouchableOpacity>
+                      )}
                     </>
                   )}
                 </View>
@@ -780,6 +862,20 @@ const styles = StyleSheet.create({
   },
   reviewButtonText: {
     color: colors.accent,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  payButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.accent,
+    paddingVertical: 16,
+    borderRadius: 16,
+    gap: 8,
+  },
+  payButtonText: {
+    color: colors.surface,
     fontSize: 16,
     fontWeight: 'bold',
   },
