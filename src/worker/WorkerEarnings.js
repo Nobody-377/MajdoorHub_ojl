@@ -7,7 +7,7 @@ import useStore from '../store/useStore';
 
 export default function WorkerEarnings() {
   const { user } = useStore();
-  const workerSkill = user?.skill || 'Plumber';
+  const workerSkills = user?.skills && user.skills.length > 0 ? user.skills : [user?.skill || 'Plumber'];
   const [balance, setBalance] = useState(3450);
   const [isWithdrawVisible, setIsWithdrawVisible] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -42,19 +42,55 @@ export default function WorkerEarnings() {
       { id: 'pa3', title: 'Living Room Full Touch-up', customer: 'Shah Rukh Khan', date: '15 Jun, 12:00 PM', amount: 5000, status: 'Credited' },
       { id: 'pa4', title: 'Door & Window Frame Painting', customer: 'Amitabh Bachchan', date: '12 Jun, 1:00 PM', amount: 1500, status: 'Credited' },
     ],
+    cleaner: [
+      { id: 'cl1', title: 'Sofa and Carpet Shampooing', customer: 'Karishma Kapoor', date: 'Today, 2:00 PM', amount: 700, status: 'Credited' },
+      { id: 'cl2', title: 'Kitchen Deep Cleaning', customer: 'Madhuri Dixit', date: 'Yesterday, 4:00 PM', amount: 1000, status: 'Credited' },
+      { id: 'cl3', title: 'Bathroom Floor Cleaning', customer: 'Rekha Ji', date: '15 Jun, 3:00 PM', amount: 350, status: 'Credited' },
+    ],
+    ac_service: [
+      { id: 'ac1', title: 'AC Filter Cleaning & Service', customer: 'Aishwarya Rai', date: 'Today, 3:00 PM', amount: 400, status: 'Credited' },
+      { id: 'ac2', title: 'Split AC Installation', customer: 'Priyanka Chopra', date: 'Yesterday, 1:00 PM', amount: 1200, status: 'Credited' },
+      { id: 'ac3', title: 'AC Compressor Replacement', customer: 'Kareena Kapoor', date: '15 Jun, 2:00 PM', amount: 3500, status: 'Credited' },
+    ],
+    gardener: [
+      { id: 'g1', title: 'Balcony Garden Vertical Setup', customer: 'Saif Ali Khan', date: 'Today, 5:00 PM', amount: 2000, status: 'Credited' },
+      { id: 'g2', title: 'Tree Pruning & Leaf Clearing', customer: 'Hrithik Roshan', date: 'Yesterday, 11:00 AM', amount: 400, status: 'Credited' },
+      { id: 'g3', title: 'Lawn Mowing & Trimming', customer: 'Salman Khan', date: '15 Jun, 9:00 AM', amount: 300, status: 'Credited' },
+    ],
+    other: [
+      { id: 'o1', title: 'Home Furniture Moving', customer: 'Tiger Shroff', date: 'Today, 2:30 PM', amount: 600, status: 'Credited' },
+      { id: 'o2', title: 'Package Delivery Assistance', customer: 'Varun Dhawan', date: 'Yesterday, 5:00 PM', amount: 300, status: 'Credited' },
+      { id: 'o3', title: 'Helper for Packing & Loading', customer: 'John Abraham', date: '15 Jun, 10:00 AM', amount: 800, status: 'Credited' },
+    ]
   };
 
-  const getSkillKey = (skill) => {
-    const s = skill.toLowerCase();
-    if (s.includes('plumb')) return 'plumber';
-    if (s.includes('electr')) return 'electrician';
-    if (s.includes('carp')) return 'carpenter';
-    if (s.includes('paint')) return 'painter';
-    return 'plumber'; // default
+  const getSkillKeys = (skills) => {
+    return skills.map(skill => {
+      const s = skill.toLowerCase();
+      if (s.includes('plumb')) return 'plumber';
+      if (s.includes('electr')) return 'electrician';
+      if (s.includes('carp')) return 'carpenter';
+      if (s.includes('paint')) return 'painter';
+      if (s.includes('clean') || s.includes('housekeep')) return 'cleaner';
+      if (s.includes('ac ') || s.includes('air cond')) return 'ac_service';
+      if (s.includes('garden')) return 'gardener';
+      return 'other';
+    });
   };
 
-  const skillKey = getSkillKey(workerSkill);
-  const initialTransactions = txData[skillKey] || txData.plumber;
+  const skillKeys = [...new Set(getSkillKeys(workerSkills))];
+  
+  let initialTransactions = [];
+  skillKeys.forEach(key => {
+    if (txData[key]) {
+      initialTransactions = [...initialTransactions, ...txData[key]];
+    }
+  });
+
+  if (initialTransactions.length === 0) {
+    initialTransactions = txData.plumber;
+  }
+
   const transactions = [...withdrawals, ...initialTransactions];
 
   const handleWithdraw = () => {

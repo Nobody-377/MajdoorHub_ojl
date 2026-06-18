@@ -9,20 +9,24 @@ export default function WorkerDashboard({ navigation }) {
   const insets = useSafeAreaInsets();
   const [isOnline, setIsOnline] = useState(true);
   const { user, jobs } = useStore();
-  const workerSkill = user?.skill || 'Plumber';
+  const workerSkills = user?.skills && user.skills.length > 0 ? user.skills : [user?.skill || 'Plumber'];
   const activeJobs = (jobs || []).filter(job => job.status === 'accepted');
 
   const getFilteredJobsBySkill = () => {
-    const skillNorm = workerSkill.trim().toLowerCase();
     return (jobs || []).filter(job => {
       if (!job.category) return true;
       const catNorm = job.category.trim().toLowerCase();
-      return catNorm.includes(skillNorm) || skillNorm.includes(catNorm) ||
-             (skillNorm === 'plumber' && catNorm === 'plumbing') ||
-             (skillNorm === 'electrician' && catNorm === 'electrical') ||
-             (skillNorm === 'carpenter' && catNorm === 'carpentry') ||
-             (skillNorm === 'painter' && catNorm === 'painting') ||
-             (skillNorm === 'cleaner' && catNorm === 'cleaning');
+      return workerSkills.some(skill => {
+        const skillNorm = skill.trim().toLowerCase();
+        return catNorm.includes(skillNorm) || skillNorm.includes(catNorm) ||
+               (skillNorm === 'plumber' && catNorm === 'plumbing') ||
+               (skillNorm === 'electrician' && catNorm === 'electrical') ||
+               (skillNorm === 'carpenter' && catNorm === 'carpentry') ||
+               (skillNorm === 'painter' && catNorm === 'painting') ||
+               (skillNorm === 'cleaner' && catNorm === 'cleaning') ||
+               (skillNorm === 'gardener' && catNorm === 'gardening') ||
+               (skillNorm === 'other' && catNorm === 'other');
+      });
     });
   };
 
@@ -171,7 +175,7 @@ export default function WorkerDashboard({ navigation }) {
         <View style={styles.requestsContainer}>
           {visibleRequests.length === 0 ? (
             <View style={[styles.requestItem, { justifyContent: 'center', paddingVertical: 20 }]}>
-              <Text style={{ color: colors.textSecondary, fontWeight: '500' }}>No pending requests for {workerSkill}.</Text>
+              <Text style={{ color: colors.textSecondary, fontWeight: '500' }}>No pending requests for your selected skills.</Text>
             </View>
           ) : (
             visibleRequests.map(req => (

@@ -17,7 +17,7 @@ export default function SignupQuestions({ navigation, route }) {
   const [selectedCity, setSelectedCity] = useState('');
 
   // Worker-specific states
-  const [skill, setSkill] = useState('');
+  const [skills, setSkills] = useState([]);
   const [customSkill, setCustomSkill] = useState('');
   const [hourlyRate, setHourlyRate] = useState('');
   const [dailyRate, setDailyRate] = useState('');
@@ -34,7 +34,11 @@ export default function SignupQuestions({ navigation, route }) {
       setStep(step + 1);
     } else {
       const formattedPhone = `+91 ${phone.substring(0, 5)} ${phone.substring(5)}`;
-      const finalSkill = role === 'worker' ? (skill === 'Other' ? customSkill : skill) : null;
+      
+      const finalSkills = role === 'worker' 
+        ? skills.map(s => s === 'Other' ? customSkill.trim() : s).filter(Boolean)
+        : null;
+      const skillsDisplay = finalSkills && finalSkills.length > 0 ? finalSkills.join(', ') : '';
       
       setUser({
         uid: 'temp-uid',
@@ -43,7 +47,8 @@ export default function SignupQuestions({ navigation, route }) {
         name: name.trim(),
         email: email.trim() || 'Not Provided',
         location: selectedCity,
-        skill: finalSkill,
+        skills: finalSkills || [],
+        skill: skillsDisplay || 'Plumber',
         hourlyRate: role === 'worker' ? hourlyRate : null,
         dailyRate: role === 'worker' ? dailyRate : null,
         experience: role === 'worker' ? experience : null,
@@ -67,7 +72,7 @@ export default function SignupQuestions({ navigation, route }) {
   const isButtonDisabled = () => {
     if (role === 'worker') {
       if (step === 1) return name.trim().length === 0;
-      if (step === 2) return skill === '' || (skill === 'Other' && customSkill.trim().length === 0);
+      if (step === 2) return skills.length === 0 || (skills.includes('Other') && customSkill.trim().length === 0);
       if (step === 3) return !experience; // Require user to select an experience option
       if (step === 4) return !availability; // Require user to select an availability option
       if (step === 5) return hourlyRate.trim().length === 0 || dailyRate.trim().length === 0;
@@ -190,23 +195,43 @@ export default function SignupQuestions({ navigation, route }) {
         return (
           <View style={styles.stepContainer}>
             <View style={styles.header}>
-              <Text style={styles.title}>What is your primary skill?</Text>
-              <Text style={styles.subtitle}>Select your specialty so customers can find and hire you.</Text>
+              <Text style={styles.title}>What jobs/skills can you do?</Text>
+              <Text style={styles.subtitle}>Select one or more jobs/occupations you can perform so users can hire you.</Text>
             </View>
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.skillsRow} style={styles.skillsScrollContainer}>
-              {['Plumber', 'Electrician', 'Carpenter', 'Painter', 'Cleaner', 'AC Service', 'Gardener', 'Other'].map((item) => (
-                <TouchableOpacity
-                  key={item}
-                  style={[styles.skillChip, skill === item && styles.skillChipActive]}
-                  onPress={() => setSkill(item)}
-                >
-                  <Text style={[styles.skillChipText, skill === item && styles.skillChipTextActive]}>{item}</Text>
-                </TouchableOpacity>
-              ))}
+            <ScrollView contentContainerStyle={styles.categoriesGrid} showsVerticalScrollIndicator={false}>
+              {['Plumber', 'Electrician', 'Carpenter', 'Painter', 'Cleaner', 'AC Service', 'Gardener', 'Other'].map((item) => {
+                const isSelected = skills.includes(item);
+                return (
+                  <TouchableOpacity
+                    key={item}
+                    style={[styles.categoryCard, isSelected && styles.categoryCardSelected]}
+                    onPress={() => {
+                      if (item === 'Other') {
+                        if (skills.includes('Other')) {
+                          setSkills(skills.filter(s => s !== 'Other'));
+                          setCustomSkill('');
+                        } else {
+                          setSkills([...skills, 'Other']);
+                        }
+                      } else {
+                        if (skills.includes(item)) {
+                          setSkills(skills.filter(s => s !== item));
+                        } else {
+                          setSkills([...skills, item]);
+                        }
+                      }
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.categoryCardText, isSelected && styles.categoryCardTextSelected]}>{item}</Text>
+                    {isSelected && <Check color={colors.surface} size={16} />}
+                  </TouchableOpacity>
+                );
+              })}
             </ScrollView>
 
-            {skill === 'Other' && (
+            {skills.includes('Other') && (
               <View style={[styles.inputContainer, { marginTop: 16 }]}>
                 <TextInput
                   style={styles.input}

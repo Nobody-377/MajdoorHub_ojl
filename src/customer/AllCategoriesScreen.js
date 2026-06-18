@@ -50,7 +50,11 @@ export default function AllCategoriesScreen({ navigation }) {
     if (!selectedCategory) return null;
 
     const IconComponent = selectedCategory.icon;
-    const categoryWorkers = MOCK_WORKERS.filter(w => w.skill.toLowerCase() === selectedCategory.name.toLowerCase());
+    const categoryWorkers = MOCK_WORKERS.filter(w => {
+      const workerSkillLower = w.skill.toLowerCase();
+      const catNameLower = selectedCategory.name.toLowerCase();
+      return workerSkillLower.includes(catNameLower) || catNameLower.includes(workerSkillLower);
+    });
     const workersCount = categoryWorkers.length;
     const minPrice = workersCount > 0 
       ? Math.min(...categoryWorkers.map(w => w.baseRate)) 

@@ -8,7 +8,7 @@ import useStore from '../store/useStore';
 export default function JobRequests({ navigation }) {
   const insets = useSafeAreaInsets();
   const { user, jobs, updateJobStatus, declineJob } = useStore();
-  const workerSkill = user?.skill || 'Plumber';
+  const workerSkills = user?.skills && user.skills.length > 0 ? user.skills : [user?.skill || 'Plumber'];
   const [activeTab, setActiveTab] = useState('New'); // 'New' | 'Accepted' | 'Completed'
 
   const handleAccept = (id) => {
@@ -44,16 +44,20 @@ export default function JobRequests({ navigation }) {
 
   // Helper to filter jobs by worker skill
   const getFilteredJobsBySkill = () => {
-    const skillNorm = workerSkill.trim().toLowerCase();
     return jobs.filter(job => {
       if (!job.category) return true;
       const catNorm = job.category.trim().toLowerCase();
-      return catNorm.includes(skillNorm) || skillNorm.includes(catNorm) ||
-             (skillNorm === 'plumber' && catNorm === 'plumbing') ||
-             (skillNorm === 'electrician' && catNorm === 'electrical') ||
-             (skillNorm === 'carpenter' && catNorm === 'carpentry') ||
-             (skillNorm === 'painter' && catNorm === 'painting') ||
-             (skillNorm === 'cleaner' && catNorm === 'cleaning');
+      return workerSkills.some(skill => {
+        const skillNorm = skill.trim().toLowerCase();
+        return catNorm.includes(skillNorm) || skillNorm.includes(catNorm) ||
+               (skillNorm === 'plumber' && catNorm === 'plumbing') ||
+               (skillNorm === 'electrician' && catNorm === 'electrical') ||
+               (skillNorm === 'carpenter' && catNorm === 'carpentry') ||
+               (skillNorm === 'painter' && catNorm === 'painting') ||
+               (skillNorm === 'cleaner' && catNorm === 'cleaning') ||
+               (skillNorm === 'gardener' && catNorm === 'gardening') ||
+               (skillNorm === 'other' && catNorm === 'other');
+      });
     });
   };
 

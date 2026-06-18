@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform, Image, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Camera, LogOut, Eye, Trash2, Image as ImageIcon } from 'lucide-react-native';
+import { Camera, LogOut, Eye, Trash2, Image as ImageIcon, Check } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import colors from '../utils/colors';
 import useStore from '../store/useStore';
@@ -10,7 +10,21 @@ export default function WorkerProfileEdit() {
   const { setAuthenticated, setRole, user, setUser } = useStore();
   const [name, setName] = useState(user?.name || 'Ramesh Kumar');
   const [phone, setPhone] = useState(user?.phone || '+91 98765 43210');
-  const [skill, setSkill] = useState(user?.skill || 'Plumber');
+  
+  const getInitialSkills = () => {
+    if (user?.skills && user.skills.length > 0) return user.skills;
+    if (user?.skill) return user.skill.split(', ');
+    return ['Plumber'];
+  };
+  const [skills, setSkills] = useState(getInitialSkills());
+  
+  const getInitialCustomSkill = () => {
+    const s = getInitialSkills();
+    const custom = s.find(item => !['Plumber', 'Electrician', 'Carpenter', 'Painter', 'Cleaner', 'AC Service', 'Gardener'].includes(item));
+    return custom || '';
+  };
+  const [customSkill, setCustomSkill] = useState(getInitialCustomSkill());
+  
   const [hourly, setHourly] = useState(user?.hourlyRate || '400');
   const [daily, setDaily] = useState(user?.dailyRate || '1200');
   const [experience, setExperience] = useState(user?.experience || '3-5 years');
@@ -109,12 +123,26 @@ export default function WorkerProfileEdit() {
   };
 
   const handleSave = () => {
+    if (skills.length === 0) {
+      Alert.alert('Required', 'Please select at least one skill.');
+      return;
+    }
+    const hasOther = skills.includes('Other') || skills.some(s => !['Plumber', 'Electrician', 'Carpenter', 'Painter', 'Cleaner', 'AC Service', 'Gardener', 'Other'].includes(s));
+    if (hasOther && !customSkill.trim()) {
+      Alert.alert('Required', 'Please enter your custom skill.');
+      return;
+    }
+
+    const finalSkills = skills.map(s => s === 'Other' ? customSkill.trim() : s).filter(Boolean);
+    const skillsDisplay = finalSkills.join(', ');
+
     if (setUser) {
       setUser({
         ...user,
         name,
         phone,
-        skill,
+        skills: finalSkills,
+        skill: skillsDisplay,
         hourlyRate: hourly,
         dailyRate: daily,
         experience,
@@ -159,8 +187,56 @@ export default function WorkerProfileEdit() {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Primary Skill</Text>
-          <TextInput style={styles.input} value={skill} onChangeText={setSkill} />
+          <Text style={styles.label}>Skills / Occupations</Text>
+          <View style={styles.categoriesGrid}>
+            {['Plumber', 'Electrician', 'Carpenter', 'Painter', 'Cleaner', 'AC Service', 'Gardener', 'Other'].map((item) => {
+              const isSelected = skills.includes(item) || (item === 'Other' && skills.some(s => !['Plumber', 'Electrician', 'Carpenter', 'Painter', 'Cleaner', 'AC Service', 'Gardener', 'Other'].includes(s)));
+              return (
+                <TouchableOpacity
+                  key={item}
+                  style={[styles.categoryCard, isSelected && styles.categoryCardSelected]}
+                  onPress={() => {
+                    if (item === 'Other') {
+                      if (skills.includes('Other')) {
+                        setSkills(skills.filter(s => s !== 'Other'));
+                        setCustomSkill('');
+                      } else {
+                        setSkills([...skills, 'Other']);
+                      }
+                    } else {
+                      if (skills.includes(item)) {
+                        setSkills(skills.filter(s => s !== item));
+                      } else {
+                        setSkills([...skills, item]);
+                      }
+                    }
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.categoryCardText, isSelected && styles.categoryCardTextSelected]}>{item}</Text>
+                  {isSelected && <Check color={colors.surface} size={16} />}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {(skills.includes('Other') || skills.some(s => !['Plumber', 'Electrician', 'Carpenter', 'Painter', 'Cleaner', 'AC Service', 'Gardener', 'Other'].includes(s))) && (
+            <TextInput
+              style={[styles.input, { marginTop: 12 }]}
+              placeholder="Type your skill (e.g. Mason, Welder)"
+              placeholderTextColor={colors.textLight}
+              value={customSkill}
+              onChangeText={(text) => {
+                setCustomSkill(text);
+                const baseSkills = skills.filter(s => ['Plumber', 'Electrician', 'Carpenter', 'Painter', 'Cleaner', 'AC Service', 'Gardener'].includes(s));
+                if (text.trim()) {
+                  setSkills([...baseSkills, text.trim()]);
+                } else {
+                  setSkills(baseSkills);
+                }
+              }}
+            />
+          )}
         </View>
 
         <View style={styles.inputGroup}>
@@ -523,5 +599,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.textSecondary,
+  },
+  categoriesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 8,
+  },
+  categoryCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    minWidth: '45%',
+    flexGrow: 1,
+  },
+  categoryCardSelected: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
+  categoryCardText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  categoryCardTextSelected: {
+    color: colors.surface,
   },
 });

@@ -35,7 +35,11 @@ export default function AllWorkersScreen({ navigation }) {
     // 1. Filter
     let result = [...MOCK_WORKERS];
     if (selectedFilter !== 'All') {
-      result = result.filter(w => w.skill.toLowerCase() === selectedFilter.toLowerCase());
+      result = result.filter(w => {
+        const workerSkillLower = w.skill.toLowerCase();
+        const filterLower = selectedFilter.toLowerCase();
+        return workerSkillLower.includes(filterLower) || filterLower.includes(workerSkillLower);
+      });
     }
 
     // 2. Sort
