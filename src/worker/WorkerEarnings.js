@@ -7,6 +7,7 @@ import useStore from '../store/useStore';
 
 export default function WorkerEarnings() {
   const { user } = useStore();
+  const workerSkill = user?.skill || 'Plumber';
   const [balance, setBalance] = useState(3450);
   const [isWithdrawVisible, setIsWithdrawVisible] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -14,13 +15,47 @@ export default function WorkerEarnings() {
   const [bankAccount, setBankAccount] = useState('');
   const [ifscCode, setIfscCode] = useState('');
   const [selectedMethod, setSelectedMethod] = useState('upi'); // 'upi' | 'bank'
+  const [withdrawals, setWithdrawals] = useState([]);
 
-  const [transactions, setTransactions] = useState([
-    { id: '1', title: 'Water Tank Installation', customer: 'Anita Sharma', date: 'Today, 2:00 PM', amount: 600, status: 'Credited' },
-    { id: '2', title: 'Kitchen Sink Repair', customer: 'Rohan Verma', date: 'Yesterday, 11:30 AM', amount: 300, status: 'Credited' },
-    { id: '3', title: 'Full Home Plumbing Check', customer: 'Suresh Mehta', date: '15 Jun, 4:00 PM', amount: 1200, status: 'Credited' },
-    { id: '4', title: 'Bathroom Pipe Leakage', customer: 'Amit Patel', date: '12 Jun, 10:30 AM', amount: 1350, status: 'Credited' },
-  ]);
+  const txData = {
+    plumber: [
+      { id: 'p1', title: 'Water Tank Installation', customer: 'Anita Sharma', date: 'Today, 2:00 PM', amount: 600, status: 'Credited' },
+      { id: 'p2', title: 'Kitchen Sink Repair', customer: 'Rohan Verma', date: 'Yesterday, 11:30 AM', amount: 300, status: 'Credited' },
+      { id: 'p3', title: 'Full Home Plumbing Check', customer: 'Suresh Mehta', date: '15 Jun, 4:00 PM', amount: 1200, status: 'Credited' },
+      { id: 'p4', title: 'Bathroom Pipe Leakage', customer: 'Amit Patel', date: '12 Jun, 10:30 AM', amount: 1350, status: 'Credited' },
+    ],
+    electrician: [
+      { id: 'e1', title: 'Ceiling Fan Installation', customer: 'Harish Mehta', date: 'Today, 3:00 PM', amount: 200, status: 'Credited' },
+      { id: 'e2', title: 'Short Circuit Troubleshooting', customer: 'Girish Karnad', date: 'Yesterday, 5:30 PM', amount: 500, status: 'Credited' },
+      { id: 'e3', title: 'Water Pump Wiring Repair', customer: 'Sunil Gavaskar', date: '15 Jun, 4:00 PM', amount: 900, status: 'Credited' },
+      { id: 'e4', title: 'AC Power Point Installation', customer: 'Anil Ambani', date: '12 Jun, 4:00 PM', amount: 450, status: 'Credited' },
+    ],
+    carpenter: [
+      { id: 'c1', title: 'Wooden Door Hinge Repair', customer: 'Kapil Dev', date: 'Today, 1:30 PM', amount: 250, status: 'Credited' },
+      { id: 'c2', title: 'Modular Kitchen Door Adjustment', customer: 'Sachin Tendulkar', date: 'Yesterday, 2:00 PM', amount: 1200, status: 'Credited' },
+      { id: 'c3', title: 'Sofa Cushion & Fabric Polish', customer: 'Alia Bhatt', date: '15 Jun, 4:30 PM', amount: 2500, status: 'Credited' },
+      { id: 'c4', title: 'Bed Frame Assembly', customer: 'Virat Kohli', date: '12 Jun, 10:00 AM', amount: 1500, status: 'Credited' },
+    ],
+    painter: [
+      { id: 'pa1', title: 'Single Wall Textured Painting', customer: 'Ranbir Kapoor', date: 'Today, 11:00 AM', amount: 1800, status: 'Credited' },
+      { id: 'pa2', title: 'Waterproofing & Balcony Paint', customer: 'Deepika Padukone', date: 'Yesterday, 9:00 AM', amount: 4500, status: 'Credited' },
+      { id: 'pa3', title: 'Living Room Full Touch-up', customer: 'Shah Rukh Khan', date: '15 Jun, 12:00 PM', amount: 5000, status: 'Credited' },
+      { id: 'pa4', title: 'Door & Window Frame Painting', customer: 'Amitabh Bachchan', date: '12 Jun, 1:00 PM', amount: 1500, status: 'Credited' },
+    ],
+  };
+
+  const getSkillKey = (skill) => {
+    const s = skill.toLowerCase();
+    if (s.includes('plumb')) return 'plumber';
+    if (s.includes('electr')) return 'electrician';
+    if (s.includes('carp')) return 'carpenter';
+    if (s.includes('paint')) return 'painter';
+    return 'plumber'; // default
+  };
+
+  const skillKey = getSkillKey(workerSkill);
+  const initialTransactions = txData[skillKey] || txData.plumber;
+  const transactions = [...withdrawals, ...initialTransactions];
 
   const handleWithdraw = () => {
     const amt = parseFloat(withdrawAmount);
@@ -45,7 +80,7 @@ export default function WorkerEarnings() {
     // Success Simulation
     setBalance(balance - amt);
     
-    // Add to transactions list
+    // Add to withdrawals list
     const newTx = {
       id: Date.now().toString(),
       title: `Withdrawal to ${selectedMethod === 'upi' ? 'UPI' : 'Bank'}`,
@@ -54,7 +89,7 @@ export default function WorkerEarnings() {
       amount: -amt,
       status: 'Withdrawn'
     };
-    setTransactions([newTx, ...transactions]);
+    setWithdrawals([newTx, ...withdrawals]);
 
     setWithdrawAmount('');
     setIsWithdrawVisible(false);
