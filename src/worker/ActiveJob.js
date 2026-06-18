@@ -3,8 +3,22 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, Camera, CheckCircle } from 'lucide-react-native';
 import colors from '../utils/colors';
+import useStore from '../store/useStore';
 
-export default function ActiveJob({ navigation }) {
+export default function ActiveJob({ route, navigation }) {
+  const { updateJobStatus } = useStore();
+  const { job: routeJob } = route.params || {};
+  
+  // Fallback to a default job if none is passed
+  const fallbackJob = { 
+    id: 6, 
+    title: 'Toilet flush valve repair', 
+    customer: 'Rahul Sharma', 
+    address: 'Flat 10, Ashoka Apartments, Nepean Sea Road', 
+    price: '₹400' 
+  };
+  const job = routeJob || fallbackJob;
+
   const [timer, setTimer] = useState(4500); // 1h 15m in seconds
   const [completed, setCompleted] = useState(false);
 
@@ -25,6 +39,13 @@ export default function ActiveJob({ navigation }) {
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  const handleEndWork = () => {
+    if (updateJobStatus) {
+      updateJobStatus(job.id, 'completed');
+    }
+    setCompleted(true);
+  };
+
   if (completed) {
     return (
       <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 24 }]}>
@@ -41,7 +62,7 @@ export default function ActiveJob({ navigation }) {
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Total Earned</Text>
-            <Text style={[styles.summaryVal, { color: colors.primary, fontSize: 18 }]}>₹500</Text>
+            <Text style={[styles.summaryVal, { color: colors.primary, fontSize: 18 }]}>{job.price}</Text>
           </View>
         </View>
 
@@ -68,11 +89,11 @@ export default function ActiveJob({ navigation }) {
         </View>
 
         <View style={styles.detailsCard}>
-          <Text style={styles.jobTitle}>Bathroom Pipe Leakage</Text>
-          <Text style={styles.jobCustomer}>Customer: Anita Sharma</Text>
+          <Text style={styles.jobTitle}>{job.title}</Text>
+          <Text style={styles.jobCustomer}>Customer: {job.customer}</Text>
           <View style={styles.divider} />
           <Text style={styles.addressTitle}>Address</Text>
-          <Text style={styles.address}>B-402, Green Park Society, Andheri West</Text>
+          <Text style={styles.address}>{job.address}</Text>
         </View>
 
         <View style={styles.proofSection}>
@@ -85,7 +106,7 @@ export default function ActiveJob({ navigation }) {
 
         <View style={{ flex: 1 }} />
 
-        <TouchableOpacity style={styles.endJobBtn} onPress={() => setCompleted(true)}>
+        <TouchableOpacity style={styles.endJobBtn} onPress={handleEndWork}>
           <Text style={styles.endJobBtnText}>End Work Session</Text>
         </TouchableOpacity>
       </View>

@@ -8,7 +8,8 @@ import useStore from '../store/useStore';
 export default function WorkerDashboard({ navigation }) {
   const insets = useSafeAreaInsets();
   const [isOnline, setIsOnline] = useState(true);
-  const { user } = useStore();
+  const { user, jobs } = useStore();
+  const activeJobs = (jobs || []).filter(job => job.status === 'accepted');
   const [newRequests] = useState([
     { id: 1, title: 'Water tank installation', distance: '2.5 km away', time: 'Today, 2:00 PM', price: '₹600' },
     { id: 2, title: 'Kitchen sink repair', distance: '4.1 km away', time: 'Tomorrow, 10:00 AM', price: '₹300' },
@@ -98,37 +99,51 @@ export default function WorkerDashboard({ navigation }) {
         </View>
       </View>
 
-      {/* Active Job */}
+      {/* Active Jobs */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Active Job</Text>
-        <View style={styles.activeJobCard}>
-          <View style={styles.activeJobHeader}>
-            <View>
-              <Text style={styles.jobTitle}>Bathroom Pipe Leakage</Text>
-              <Text style={styles.jobCustomer}>Customer: Anita Sharma</Text>
-            </View>
-            <View style={styles.badgeWarning}>
-              <Text style={styles.badgeWarningText}>In Progress</Text>
-            </View>
+        <Text style={styles.sectionTitle}>Active Jobs ({activeJobs.length})</Text>
+        {activeJobs.length === 0 ? (
+          <View style={[styles.activeJobCard, { borderLeftColor: colors.textLight, paddingVertical: 24, alignItems: 'center' }]}>
+            <Text style={{ color: colors.textSecondary, fontWeight: '600', marginBottom: 12 }}>No active jobs at the moment.</Text>
+            <TouchableOpacity 
+              style={[styles.completeBtn, { backgroundColor: colors.accent, width: '80%', paddingVertical: 12, height: 48, justifyContent: 'center' }]}
+              onPress={() => navigation.navigate('Jobs')}
+            >
+              <Text style={styles.completeBtnText}>View Available Jobs</Text>
+            </TouchableOpacity>
           </View>
-          <View style={styles.jobDetails}>
-            <View style={styles.jobDetailRow}>
-              <Clock size={16} color={colors.textSecondary} />
-              <Text style={styles.jobDetailText}>Started at 10:30 AM (1h 15m ago)</Text>
+        ) : (
+          activeJobs.map(job => (
+            <View key={job.id} style={[styles.activeJobCard, { marginBottom: 12 }]}>
+              <View style={styles.activeJobHeader}>
+                <View style={{ flex: 1, marginRight: 8 }}>
+                  <Text style={styles.jobTitle}>{job.title}</Text>
+                  <Text style={styles.jobCustomer}>Customer: {job.customer} • {job.price}</Text>
+                </View>
+                <View style={styles.badgeWarning}>
+                  <Text style={styles.badgeWarningText}>In Progress</Text>
+                </View>
+              </View>
+              <View style={styles.jobDetails}>
+                <View style={styles.jobDetailRow}>
+                  <Clock size={16} color={colors.textSecondary} />
+                  <Text style={styles.jobDetailText}>{job.time}</Text>
+                </View>
+                <View style={styles.jobDetailRow}>
+                  <MapPin size={16} color={colors.textSecondary} />
+                  <Text style={styles.jobDetailText} numberOfLines={1}>{job.address}</Text>
+                </View>
+              </View>
+              <TouchableOpacity 
+                style={styles.completeBtn}
+                onPress={() => navigation.navigate('ActiveJob', { job })}
+              >
+                <CheckCircle size={18} color={colors.surface} />
+                <Text style={styles.completeBtnText}>Start Work Session</Text>
+              </TouchableOpacity>
             </View>
-            <View style={styles.jobDetailRow}>
-              <MapPin size={16} color={colors.textSecondary} />
-              <Text style={styles.jobDetailText}>B-402, Green Park Society, Andheri</Text>
-            </View>
-          </View>
-          <TouchableOpacity 
-            style={styles.completeBtn}
-            onPress={() => navigation.navigate('ActiveJob')}
-          >
-            <CheckCircle size={18} color={colors.surface} />
-            <Text style={styles.completeBtnText}>View / Mark as Completed</Text>
-          </TouchableOpacity>
-        </View>
+          ))
+        )}
       </View>
 
       {/* New Requests Summary */}
