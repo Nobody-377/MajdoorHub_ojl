@@ -38,7 +38,7 @@ export default function WorkerProfileEdit() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -81,7 +81,7 @@ export default function WorkerProfileEdit() {
               ) : (
                 <Text style={styles.avatarText}>{getInitials(name)}</Text>
               )}
-              <Camera color={colors.surface} size={24} style={styles.cameraIcon} />
+              <Camera color={colors.accent} size={24} style={styles.cameraIcon} />
             </View>
           </TouchableOpacity>
           <TouchableOpacity onPress={pickImage}>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   avatar: { width: 100, height: 100, borderRadius: 50, backgroundColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   avatarImage: { width: 100, height: 100, borderRadius: 50 },
   avatarText: { fontSize: 32, fontWeight: 'bold', color: colors.textSecondary },
-  cameraIcon: { position: 'absolute', bottom: 10, right: 10, backgroundColor: colors.primary, padding: 6, borderRadius: 16, overflow: 'hidden' },
+  cameraIcon: { position: 'absolute', bottom: 6, right: 6 },
   changePhoto: { color: colors.accent, fontWeight: 'bold', marginTop: 12 },
   inputGroup: { marginBottom: 20 },
   label: { fontSize: 14, fontWeight: '600', color: colors.textSecondary, marginBottom: 8 },

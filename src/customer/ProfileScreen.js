@@ -34,7 +34,7 @@ export default function ProfileScreen() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -448,9 +448,7 @@ export default function ProfileScreen() {
               ) : (
                 <Text style={styles.avatarText}>{getInitials(name)}</Text>
               )}
-              <View style={styles.cameraIconContainer}>
-                <Camera size={12} color={colors.surface} />
-              </View>
+              <Camera size={16} color={colors.accent} style={styles.cameraIcon} />
             </View>
           </TouchableOpacity>
           <View style={styles.profileInfo}>
@@ -571,18 +569,10 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 32,
   },
-  cameraIconContainer: {
+  cameraIcon: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: colors.accent,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: colors.surface,
+    bottom: 2,
+    right: 2,
   },
   avatarText: {
     color: colors.surface,
