@@ -17,12 +17,30 @@ export default function ProfileScreen() {
   const [email, setEmail] = useState(user?.email || 'nandini@example.com');
   const [preferredCategories, setPreferredCategories] = useState(user?.preferredCategories || []);
   const [profileImage, setProfileImage] = useState(user?.profileImage || null);
+  const [isViewImageVisible, setIsViewImageVisible] = useState(false);
 
   const getInitials = (name) => {
     if (!name) return 'U';
     const parts = name.trim().split(/\s+/);
     if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const handleAvatarPress = () => {
+    const options = [
+      { text: 'Update Picture', onPress: pickImage },
+      { text: 'Cancel', style: 'cancel' }
+    ];
+    
+    if (profileImage) {
+      options.unshift({ text: 'View Picture', onPress: () => setIsViewImageVisible(true) });
+    }
+    
+    Alert.alert(
+      'Profile Photo',
+      'Choose an action for your profile picture.',
+      options
+    );
   };
 
   const pickImage = async () => {
@@ -441,7 +459,7 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={[styles.scrollContainer, { paddingBottom: 80 + insets.bottom }]} showsVerticalScrollIndicator={false}>
         {/* User Card */}
         <View style={styles.profileCard}>
-          <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
+          <TouchableOpacity onPress={handleAvatarPress} activeOpacity={0.8}>
             <View style={styles.avatarContainer}>
               {profileImage ? (
                 <Image source={{ uri: profileImage }} style={styles.avatarImage} />
@@ -511,6 +529,33 @@ export default function ProfileScreen() {
 
             {/* Modal Body */}
             {renderModalContent()}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Full Screen Image Viewer Modal */}
+      <Modal
+        visible={isViewImageVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsViewImageVisible(false)}
+      >
+        <View style={styles.imageViewerOverlay}>
+          <TouchableOpacity 
+            style={styles.imageViewerCloseArea} 
+            activeOpacity={1} 
+            onPress={() => setIsViewImageVisible(false)}
+          />
+          <View style={styles.imageViewerContainer}>
+            {profileImage && (
+              <Image source={{ uri: profileImage }} style={styles.fullScreenImage} resizeMode="contain" />
+            )}
+            <TouchableOpacity 
+              style={styles.imageViewerCloseBtn} 
+              onPress={() => setIsViewImageVisible(false)}
+            >
+              <Text style={styles.imageViewerCloseText}>Close</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -1094,5 +1139,41 @@ const styles = StyleSheet.create({
   },
   chipTextActive: {
     color: colors.surface,
+  },
+  imageViewerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imageViewerCloseArea: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  imageViewerContainer: {
+    width: '90%',
+    height: '75%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullScreenImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+  },
+  imageViewerCloseBtn: {
+    marginTop: 24,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+  },
+  imageViewerCloseText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

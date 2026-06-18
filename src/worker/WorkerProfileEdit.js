@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform, Image, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Camera, LogOut } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -16,6 +16,7 @@ export default function WorkerProfileEdit() {
   const [experience, setExperience] = useState(user?.experience || '3-5 years');
   const [availability, setAvailability] = useState(user?.availability || 'Full-time');
   const [profileImage, setProfileImage] = useState(user?.profileImage || null);
+  const [isViewImageVisible, setIsViewImageVisible] = useState(false);
 
   const handleLogout = () => {
     setAuthenticated(false);
@@ -27,6 +28,23 @@ export default function WorkerProfileEdit() {
     const parts = name.trim().split(/\s+/);
     if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const handleAvatarPress = () => {
+    const options = [
+      { text: 'Update Picture', onPress: pickImage },
+      { text: 'Cancel', style: 'cancel' }
+    ];
+    
+    if (profileImage) {
+      options.unshift({ text: 'View Picture', onPress: () => setIsViewImageVisible(true) });
+    }
+    
+    Alert.alert(
+      'Profile Photo',
+      'Choose an action for your profile picture.',
+      options
+    );
   };
 
   const pickImage = async () => {
@@ -74,17 +92,17 @@ export default function WorkerProfileEdit() {
 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.avatarSection}>
-          <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
+          <TouchableOpacity onPress={handleAvatarPress} activeOpacity={0.8}>
             <View style={styles.avatar}>
               {profileImage ? (
                 <Image source={{ uri: profileImage }} style={styles.avatarImage} />
               ) : (
                 <Text style={styles.avatarText}>{getInitials(name)}</Text>
               )}
-              <Camera color={colors.accent} size={24} style={styles.cameraIcon} />
+              <Camera color={colors.surface} size={24} style={styles.cameraIcon} />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={pickImage}>
+          <TouchableOpacity onPress={handleAvatarPress}>
             <Text style={styles.changePhoto}>Change Photo</Text>
           </TouchableOpacity>
         </View>
@@ -158,6 +176,33 @@ export default function WorkerProfileEdit() {
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Full Screen Image Viewer Modal */}
+      <Modal
+        visible={isViewImageVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsViewImageVisible(false)}
+      >
+        <View style={styles.imageViewerOverlay}>
+          <TouchableOpacity 
+            style={styles.imageViewerCloseArea} 
+            activeOpacity={1} 
+            onPress={() => setIsViewImageVisible(false)}
+          />
+          <View style={styles.imageViewerContainer}>
+            {profileImage && (
+              <Image source={{ uri: profileImage }} style={styles.fullScreenImage} resizeMode="contain" />
+            )}
+            <TouchableOpacity 
+              style={styles.imageViewerCloseBtn} 
+              onPress={() => setIsViewImageVisible(false)}
+            >
+              <Text style={styles.imageViewerCloseText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -222,5 +267,41 @@ const styles = StyleSheet.create({
   },
   chipTextActive: {
     color: colors.surface,
+  },
+  imageViewerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imageViewerCloseArea: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  imageViewerContainer: {
+    width: '90%',
+    height: '75%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullScreenImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+  },
+  imageViewerCloseBtn: {
+    marginTop: 24,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+  },
+  imageViewerCloseText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
