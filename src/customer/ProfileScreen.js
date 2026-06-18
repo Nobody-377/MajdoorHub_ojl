@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Switch, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Switch, Alert, Platform, Image } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LogOut, User, MapPin, CreditCard, HelpCircle, Shield, Share2, ChevronRight, Edit3, X, Save, Plus, Key, RefreshCw, Trash2, Smartphone } from 'lucide-react-native';
+import { LogOut, User, MapPin, CreditCard, HelpCircle, Shield, Share2, ChevronRight, Edit3, X, Save, Plus, Key, RefreshCw, Trash2, Smartphone, Camera } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
 import colors from '../utils/colors';
 import useStore from '../store/useStore';
 
@@ -15,6 +16,41 @@ export default function ProfileScreen() {
   const [phone, setPhone] = useState(user?.phone || '+91 98765 43210');
   const [email, setEmail] = useState(user?.email || 'nandini@example.com');
   const [preferredCategories, setPreferredCategories] = useState(user?.preferredCategories || []);
+  const [profileImage, setProfileImage] = useState(user?.profileImage || null);
+
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'We need camera roll permissions to upload your profile photo.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setProfileImage(uri);
+      if (setUser) {
+        setUser({
+          ...user,
+          profileImage: uri,
+        });
+      }
+    }
+  };
 
   // Address dynamic state
   const [addresses, setAddresses] = useState([
@@ -50,6 +86,7 @@ export default function ProfileScreen() {
       if (user.phone) setPhone(user.phone);
       if (user.email) setEmail(user.email);
       if (user.preferredCategories) setPreferredCategories(user.preferredCategories);
+      setProfileImage(user.profileImage || null);
     }
   }, [user]);
 
@@ -81,7 +118,7 @@ export default function ProfileScreen() {
 
   const handleSaveProfile = () => {
     if (setUser) {
-      setUser({ ...user, name, phone, email, preferredCategories });
+      setUser({ ...user, name, phone, email, preferredCategories, profileImage });
     }
     setActiveModal(null);
     Alert.alert('Success', 'Profile details updated successfully!');
@@ -404,9 +441,18 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={[styles.scrollContainer, { paddingBottom: 80 + insets.bottom }]} showsVerticalScrollIndicator={false}>
         {/* User Card */}
         <View style={styles.profileCard}>
-          <View style={styles.avatarContainer}>
-            <Text style={styles.avatarText}>NP</Text>
-          </View>
+          <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
+            <View style={styles.avatarContainer}>
+              {profileImage ? (
+                <Image source={{ uri: profileImage }} style={styles.avatarImage} />
+              ) : (
+                <Text style={styles.avatarText}>{getInitials(name)}</Text>
+              )}
+              <View style={styles.cameraIconContainer}>
+                <Camera size={12} color={colors.surface} />
+              </View>
+            </View>
+          </TouchableOpacity>
           <View style={styles.profileInfo}>
             <Text style={styles.name}>{name}</Text>
             <Text style={styles.phone}>{phone}</Text>
@@ -518,6 +564,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
+    position: 'relative',
+  },
+  avatarImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+  },
+  cameraIconContainer: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: colors.accent,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: colors.surface,
   },
   avatarText: {
     color: colors.surface,

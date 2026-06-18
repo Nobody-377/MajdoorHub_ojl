@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Camera, LogOut } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
 import colors from '../utils/colors';
 import useStore from '../store/useStore';
 
@@ -14,6 +15,7 @@ export default function WorkerProfileEdit() {
   const [daily, setDaily] = useState(user?.dailyRate || '1200');
   const [experience, setExperience] = useState(user?.experience || '3-5 years');
   const [availability, setAvailability] = useState(user?.availability || 'Full-time');
+  const [profileImage, setProfileImage] = useState(user?.profileImage || null);
 
   const handleLogout = () => {
     setAuthenticated(false);
@@ -27,6 +29,26 @@ export default function WorkerProfileEdit() {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'We need camera roll permissions to upload your profile photo.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
+
   const handleSave = () => {
     if (setUser) {
       setUser({
@@ -38,6 +60,7 @@ export default function WorkerProfileEdit() {
         dailyRate: daily,
         experience,
         availability,
+        profileImage,
       });
       Alert.alert('Success', 'Profile updated successfully!');
     }
@@ -51,11 +74,19 @@ export default function WorkerProfileEdit() {
       
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.avatarSection}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{getInitials(name)}</Text>
-            <Camera color={colors.surface} size={24} style={styles.cameraIcon} />
-          </View>
-          <Text style={styles.changePhoto}>Change Photo</Text>
+          <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
+            <View style={styles.avatar}>
+              {profileImage ? (
+                <Image source={{ uri: profileImage }} style={styles.avatarImage} />
+              ) : (
+                <Text style={styles.avatarText}>{getInitials(name)}</Text>
+              )}
+              <Camera color={colors.surface} size={24} style={styles.cameraIcon} />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={pickImage}>
+            <Text style={styles.changePhoto}>Change Photo</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.inputGroup}>
@@ -138,6 +169,7 @@ const styles = StyleSheet.create({
   content: { padding: 20 },
   avatarSection: { alignItems: 'center', marginBottom: 24 },
   avatar: { width: 100, height: 100, borderRadius: 50, backgroundColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+  avatarImage: { width: 100, height: 100, borderRadius: 50 },
   avatarText: { fontSize: 32, fontWeight: 'bold', color: colors.textSecondary },
   cameraIcon: { position: 'absolute', bottom: 10, right: 10, backgroundColor: colors.primary, padding: 6, borderRadius: 16, overflow: 'hidden' },
   changePhoto: { color: colors.accent, fontWeight: 'bold', marginTop: 12 },

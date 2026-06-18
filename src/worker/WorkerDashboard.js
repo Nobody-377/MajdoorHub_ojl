@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Image } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell, Wallet, Star, ShieldCheck, Clock, MapPin, CheckCircle } from 'lucide-react-native';
 import colors from '../utils/colors';
@@ -34,7 +34,11 @@ export default function WorkerDashboard({ navigation }) {
           <View style={styles.headerTop}>
             <View style={styles.userInfoRow}>
               <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{getInitials(user?.name || 'Ramesh Kumar')}</Text>
+                {user?.profileImage ? (
+                  <Image source={{ uri: user.profileImage }} style={styles.avatarImage} />
+                ) : (
+                  <Text style={styles.avatarText}>{getInitials(user?.name || 'Ramesh Kumar')}</Text>
+                )}
               </View>
               <View>
                 <Text style={styles.welcomeText}>Welcome back,</Text>
@@ -161,6 +165,7 @@ const styles = StyleSheet.create({
   headerBg: { backgroundColor: colors.primary, paddingHorizontal: 20, paddingTop: 16, paddingBottom: 50, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, marginTop: 10 },
   avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+  avatarImage: { width: 48, height: 48, borderRadius: 24 },
   avatarText: { color: colors.primary, fontWeight: 'bold', fontSize: 16 },
   welcomeText: { color: 'rgba(255,255,255,0.8)', fontSize: 12 },
   nameText: { color: colors.surface, fontWeight: 'bold', fontSize: 18 },
