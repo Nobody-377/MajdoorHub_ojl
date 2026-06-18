@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform, Image, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Camera, LogOut } from 'lucide-react-native';
+import { Camera, LogOut, Eye, Trash2, Image as ImageIcon } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import colors from '../utils/colors';
 import useStore from '../store/useStore';
@@ -17,6 +17,7 @@ export default function WorkerProfileEdit() {
   const [availability, setAvailability] = useState(user?.availability || 'Full-time');
   const [profileImage, setProfileImage] = useState(user?.profileImage || null);
   const [isViewImageVisible, setIsViewImageVisible] = useState(false);
+  const [isOptionsVisible, setIsOptionsVisible] = useState(false);
 
   const handleLogout = () => {
     setAuthenticated(false);
@@ -31,20 +32,7 @@ export default function WorkerProfileEdit() {
   };
 
   const handleAvatarPress = () => {
-    const options = [
-      { text: 'Update Picture', onPress: pickImage },
-      { text: 'Cancel', style: 'cancel' }
-    ];
-    
-    if (profileImage) {
-      options.unshift({ text: 'View Picture', onPress: () => setIsViewImageVisible(true) });
-    }
-    
-    Alert.alert(
-      'Profile Photo',
-      'Choose an action for your profile picture.',
-      options
-    );
+    setIsOptionsVisible(true);
   };
 
   const pickImage = async () => {
@@ -64,7 +52,46 @@ export default function WorkerProfileEdit() {
 
     if (!result.canceled) {
       setProfileImage(result.assets[0].uri);
+      setIsOptionsVisible(false);
     }
+  };
+
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'We need camera permissions to take a photo.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+      setIsOptionsVisible(false);
+    }
+  };
+
+  const removeImage = () => {
+    Alert.alert(
+      'Remove Photo',
+      'Are you sure you want to remove your profile photo?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Remove', 
+          style: 'destructive',
+          onPress: () => {
+            setProfileImage(null);
+            setIsOptionsVisible(false);
+          }
+        }
+      ]
+    );
   };
 
   const handleSave = () => {
@@ -99,7 +126,7 @@ export default function WorkerProfileEdit() {
               ) : (
                 <Text style={styles.avatarText}>{getInitials(name)}</Text>
               )}
-              <Camera color={colors.surface} size={24} style={styles.cameraIcon} />
+              <Camera color={colors.accent} size={24} style={styles.cameraIcon} />
             </View>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleAvatarPress}>
@@ -199,6 +226,71 @@ export default function WorkerProfileEdit() {
               onPress={() => setIsViewImageVisible(false)}
             >
               <Text style={styles.imageViewerCloseText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Premium Photo Options Bottom Sheet */}
+      <Modal
+        visible={isOptionsVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsOptionsVisible(false)}
+      >
+        <View style={styles.sheetOverlay}>
+          <TouchableOpacity 
+            style={styles.sheetCloseArea} 
+            activeOpacity={1} 
+            onPress={() => setIsOptionsVisible(false)}
+          />
+          <View style={styles.sheetContainer}>
+            {/* Top Drag Handle Indicator */}
+            <View style={styles.sheetHandle} />
+
+            {/* Sheet Header */}
+            <View style={styles.sheetHeader}>
+              <View style={styles.sheetHeaderLeft}>
+                {profileImage ? (
+                  <Image source={{ uri: profileImage }} style={styles.sheetAvatarPreview} />
+                ) : (
+                  <View style={styles.sheetAvatarPlaceholder}>
+                    <Text style={styles.sheetAvatarPlaceholderText}>{getInitials(name)}</Text>
+                  </View>
+                )}
+                <Text style={styles.sheetTitle}>Profile Picture Options</Text>
+              </View>
+            </View>
+
+            {/* Options List */}
+            <View style={styles.sheetOptionsList}>
+              <TouchableOpacity style={styles.sheetOptionBtn} onPress={pickImage}>
+                <View style={[styles.sheetIconContainer, { backgroundColor: `${colors.primary}12` }]}>
+                  <ImageIcon size={22} color={colors.primary} />
+                </View>
+                <View style={styles.sheetOptionTextContainer}>
+                  <Text style={styles.sheetOptionTitle}>Upload</Text>
+                  <Text style={styles.sheetOptionSubtitle}>Choose an image from your library</Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.sheetOptionBtn} onPress={takePhoto}>
+                <View style={[styles.sheetIconContainer, { backgroundColor: `${colors.accent}12` }]}>
+                  <Camera size={22} color={colors.accent} />
+                </View>
+                <View style={styles.sheetOptionTextContainer}>
+                  <Text style={styles.sheetOptionTitle}>Update</Text>
+                  <Text style={styles.sheetOptionSubtitle}>Take a new photo with camera</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            {/* Cancel Button */}
+            <TouchableOpacity 
+              style={styles.sheetCancelBtn} 
+              onPress={() => setIsOptionsVisible(false)}
+            >
+              <Text style={styles.sheetCancelBtnText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -303,5 +395,119 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  sheetOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  sheetCloseArea: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  sheetContainer: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 24,
+  },
+  sheetHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: colors.border,
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    marginBottom: 16,
+  },
+  sheetHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  sheetAvatarPreview: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+  },
+  sheetAvatarPlaceholder: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sheetAvatarPlaceholderText: {
+    color: colors.surface,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  sheetTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.text,
+  },
+  sheetOptionsList: {
+    gap: 12,
+    marginBottom: 24,
+  },
+  sheetOptionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    gap: 16,
+    backgroundColor: colors.background,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  sheetIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sheetOptionTextContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    gap: 2,
+  },
+  sheetOptionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  sheetOptionSubtitle: {
+    fontSize: 12,
+    color: colors.textSecondary,
+  },
+  sheetCancelBtn: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 16,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  sheetCancelBtnText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.textSecondary,
   },
 });
