@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { ArrowRight, User, Mail, MapPin, Wrench, DollarSign, Clock, Briefcase, Calendar, Check } from 'lucide-react-native';
+import { ArrowRight, User, Mail, MapPin, Wrench, IndianRupee, Clock, Briefcase, Calendar, Check } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../utils/colors';
 import useStore from '../store/useStore';
@@ -260,7 +260,7 @@ export default function SignupQuestions({ navigation, route }) {
                     keyboardType="numeric"
                     maxLength={6}
                   />
-                  <DollarSign color={colors.textLight} size={18} />
+                  <IndianRupee color={colors.textLight} size={18} />
                 </View>
               </View>
             </View>

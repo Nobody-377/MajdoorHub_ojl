@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Home, Briefcase, DollarSign, User } from 'lucide-react-native';
+import { Home, Briefcase, IndianRupee, User } from 'lucide-react-native';
 
 import WorkerDashboard from '../worker/WorkerDashboard';
 import JobRequests from '../worker/JobRequest';
@@ -24,7 +24,7 @@ function WorkerTabs() {
         tabBarIcon: ({ focused, color, size }) => {
           if (route.name === 'Dashboard') return <Home size={size} color={color} />;
           if (route.name === 'Jobs') return <Briefcase size={size} color={color} />;
-          if (route.name === 'Earnings') return <DollarSign size={size} color={color} />;
+          if (route.name === 'Earnings') return <IndianRupee size={size} color={color} />;
           if (route.name === 'Profile') return <User size={size} color={color} />;
         },
         tabBarActiveTintColor: colors.accent,
