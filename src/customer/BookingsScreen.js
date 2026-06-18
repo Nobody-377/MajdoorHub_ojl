@@ -48,7 +48,7 @@ export default function BookingsScreen({ navigation }) {
   const [activeTab, setActiveTab] = useState('All'); // 'All' | 'Active' | 'Completed'
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isReviewVisible, setIsReviewVisible] = useState(false);
-  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewRating, setReviewRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
 
   const filteredBookings = MOCK_BOOKINGS.filter(booking => {
@@ -294,7 +294,7 @@ export default function BookingsScreen({ navigation }) {
                       <TouchableOpacity 
                         style={styles.reviewButton}
                         onPress={() => {
-                          setReviewRating(5);
+                          setReviewRating(0);
                           setReviewText('');
                           setIsReviewVisible(true);
                         }}
@@ -360,7 +360,8 @@ export default function BookingsScreen({ navigation }) {
                   {reviewRating === 5 ? 'Excellent!' :
                    reviewRating === 4 ? 'Good' :
                    reviewRating === 3 ? 'Average' :
-                   reviewRating === 2 ? 'Poor' : 'Very Poor'}
+                   reviewRating === 2 ? 'Poor' :
+                   reviewRating === 1 ? 'Very Poor' : 'Select a rating'}
                 </Text>
 
                 {/* Review Text Input */}
@@ -379,6 +380,10 @@ export default function BookingsScreen({ navigation }) {
                 <TouchableOpacity
                   style={styles.submitReviewBtn}
                   onPress={() => {
+                    if (reviewRating === 0) {
+                      Alert.alert('Required', 'Please select a star rating.');
+                      return;
+                    }
                     if (reviewText.trim().length === 0) {
                       Alert.alert('Required', 'Please write a review comment.');
                       return;
