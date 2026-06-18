@@ -25,6 +25,13 @@ export default function CustomerHome({ navigation }) {
   const [locationModalVisible, setLocationModalVisible] = useState(false);
   const [tempLocation, setTempLocation] = useState(currentLocation);
 
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
   useEffect(() => {
     if (user?.location) {
       setCurrentLocation(user.location);
@@ -32,10 +39,10 @@ export default function CustomerHome({ navigation }) {
   }, [user?.location]);
 
   const handleSaveLocation = (newLoc) => {
-    setCurrentLocation(newLoc);
     if (user && setUser) {
       setUser({ ...user, location: newLoc });
     }
+    setCurrentLocation(newLoc);
   };
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -47,22 +54,36 @@ export default function CustomerHome({ navigation }) {
         {/* Header Area */}
         <View style={styles.headerBg}>
           <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => { setTempLocation(currentLocation); setLocationModalVisible(true); }}>
-            <Text style={styles.locationLabel}>Current Location</Text>
-            <View style={styles.locationRow}>
-              <MapPin size={16} color={colors.accent} />
-              <Text style={styles.locationText}>{currentLocation}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Profile')}
+                activeOpacity={0.8}
+              >
+                <View style={styles.avatar}>
+                  {user?.profileImage ? (
+                    <Image source={{ uri: user.profileImage }} style={styles.avatarImage} />
+                  ) : (
+                    <Text style={styles.avatarText}>{getInitials(user?.name || 'Nandini Patel')}</Text>
+                  )}
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => { setTempLocation(currentLocation); setLocationModalVisible(true); }}>
+                <Text style={styles.locationLabel}>Current Location</Text>
+                <View style={styles.locationRow}>
+                  <MapPin size={16} color={colors.accent} />
+                  <Text style={styles.locationText}>{currentLocation}</Text>
+                </View>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.bellContainer}
-            activeOpacity={0.8}
-            onPress={() => navigation.navigate('Notifications')}
-          >
-            <Bell size={24} color={colors.surface} />
-            <View style={styles.notificationDot} />
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity 
+              style={styles.bellContainer}
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('Notifications')}
+            >
+              <Bell size={24} color={colors.surface} />
+              <View style={styles.notificationDot} />
+            </TouchableOpacity>
+          </View>
 
         <TouchableOpacity 
           style={styles.searchBar}
@@ -231,6 +252,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
     marginTop: 10,
+  },
+  avatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarImage: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+  },
+  avatarText: {
+    color: colors.surface,
+    fontWeight: 'bold',
+    fontSize: 15,
   },
   locationLabel: {
     color: 'rgba(255,255,255,0.8)',

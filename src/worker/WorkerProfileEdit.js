@@ -51,7 +51,14 @@ export default function WorkerProfileEdit() {
     });
 
     if (!result.canceled) {
-      setProfileImage(result.assets[0].uri);
+      const uri = result.assets[0].uri;
+      setProfileImage(uri);
+      if (setUser) {
+        setUser({
+          ...user,
+          profileImage: uri,
+        });
+      }
       setIsOptionsVisible(false);
     }
   };
@@ -71,7 +78,14 @@ export default function WorkerProfileEdit() {
     });
 
     if (!result.canceled) {
-      setProfileImage(result.assets[0].uri);
+      const uri = result.assets[0].uri;
+      setProfileImage(uri);
+      if (setUser) {
+        setUser({
+          ...user,
+          profileImage: uri,
+        });
+      }
       setIsOptionsVisible(false);
     }
   };
