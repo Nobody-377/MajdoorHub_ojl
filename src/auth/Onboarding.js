@@ -49,40 +49,37 @@ const SLIDES = [
   }
 ];
 
-// Infinite loop cloning: Add last slide at the start, and first slide at the end
-const LOOP_SLIDES = [
-  SLIDES[SLIDES.length - 1], // Slide 2 clone at index 0
-  ...SLIDES,                 // Real slides at index 1, 2, 3
-  SLIDES[0]                  // Slide 0 clone at index 4
-];
-
 export default function Onboarding({ navigation }) {
   const { width } = useWindowDimensions();
   if (width === 0) return null;
-  const [currentIndex, setCurrentIndex] = useState(0); // tracks real index (0, 1, 2)
-  const scrollX = useRef(new Animated.Value(width > 0 ? width : 375)).current; // initial position on real slide 0
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollX = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef(null);
   const timerRef = useRef(null);
-  const isInitialScrollDone = useRef(false);
   const isDragging = useRef(false);
+  const isInitialized = useRef(false);
+
+  const virtualSlides = [
+    SLIDES[SLIDES.length - 1],
+    ...SLIDES,
+    SLIDES[0]
+  ];
+
+  const currentIndexRef = useRef(currentIndex);
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
 
   const startAutoSlide = () => {
     stopAutoSlide();
     if (isDragging.current || width <= 0) return;
     
     timerRef.current = setInterval(() => {
-      // Calculate the next index we want to scroll to in the LOOP_SLIDES list.
-      // Since real index starts at 0 (rendered at index 1), the render position is currentIndex + 1.
-      const nextRenderIndex = currentIndex + 2; 
-      
+      const nextVirtualIndex = currentIndexRef.current + 2;
       scrollViewRef.current?.scrollTo({
-        x: nextRenderIndex * width,
+        x: nextVirtualIndex * width,
         animated: true,
       });
-
-      // Optimistically update the real index state to keep dots in sync during scroll
-      const nextRealIndex = (currentIndex + 1) % SLIDES.length;
-      setCurrentIndex(nextRealIndex);
     }, 2500);
   };
 
@@ -92,40 +89,34 @@ export default function Onboarding({ navigation }) {
     }
   };
 
-  // Perform silent loop jump when scrolling reaches clones
   const handleScrollEnd = (xOffset) => {
     if (width <= 0) return;
-    const totalContentWidth = LOOP_SLIDES.length * width;
+    const virtualIndex = Math.round(xOffset / width);
     
-    // 1. If we reached the left clone (Slide 2 clone at offset 0):
-    if (xOffset <= 0.1 * width) {
-      scrollViewRef.current?.scrollTo({ x: 3 * width, animated: false });
-      setCurrentIndex(2);
-      scrollX.setValue(3 * width);
-    }
-    // 2. If we reached the right clone (Slide 0 clone at offset 4 * width):
-    else if (xOffset >= 3.9 * width) {
-      scrollViewRef.current?.scrollTo({ x: width, animated: false });
+    if (virtualIndex === 0) {
+      scrollViewRef.current?.scrollTo({
+        x: SLIDES.length * width,
+        animated: false,
+      });
+      setCurrentIndex(SLIDES.length - 1);
+    } else if (virtualIndex === SLIDES.length + 1) {
+      scrollViewRef.current?.scrollTo({
+        x: width,
+        animated: false,
+      });
       setCurrentIndex(0);
-      scrollX.setValue(width);
-    } 
-    // 3. Normal positioning inside real slides:
-    else {
-      const realIndex = Math.round(xOffset / width) - 1;
-      if (realIndex >= 0 && realIndex < SLIDES.length) {
-        setCurrentIndex(realIndex);
-      }
+    } else {
+      setCurrentIndex(virtualIndex - 1);
     }
   };
 
   useEffect(() => {
-    if (width > 0 && !isInitialScrollDone.current) {
-      // Scroll to the first real slide initially once dimensions are ready
-      setTimeout(() => {
-        scrollViewRef.current?.scrollTo({ x: width, animated: false });
-        scrollX.setValue(width);
-      }, 50);
-      isInitialScrollDone.current = true;
+    if (width > 0) {
+      scrollViewRef.current?.scrollTo({
+        x: (currentIndexRef.current + 1) * width,
+        animated: false,
+      });
+      isInitialized.current = true;
     }
   }, [width]);
 
@@ -136,13 +127,11 @@ export default function Onboarding({ navigation }) {
 
   const handleDotPress = (index) => {
     stopAutoSlide();
-    const renderIndex = index + 1;
     scrollViewRef.current?.scrollTo({
-      x: renderIndex * width,
+      x: (index + 1) * width,
       animated: true,
     });
     setCurrentIndex(index);
-    startAutoSlide();
   };
 
   const handleScroll = Animated.event(
@@ -160,10 +149,10 @@ export default function Onboarding({ navigation }) {
         ref={scrollViewRef}
         horizontal
         pagingEnabled
+        contentOffset={{ x: width, y: 0 }}
         showsHorizontalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
-        contentOffset={{ x: width, y: 0 }}
         onMomentumScrollEnd={handleMomentumScrollEnd}
         onScrollBeginDrag={() => {
           isDragging.current = true;
@@ -175,11 +164,10 @@ export default function Onboarding({ navigation }) {
         }}
         contentContainerStyle={styles.scrollContent}
       >
-        {LOOP_SLIDES.map((slide, index) => {
+        {virtualSlides.map((slide, idx) => {
           const { CenterIcon, centerColor, floatingIcons } = slide;
-          // Assign a unique key incorporating the render index to avoid key collisions
           return (
-            <View key={`${slide.id}-${index}`} style={[styles.slideWidth, { width }]}>
+            <View key={`${slide.id}-${idx}`} style={[styles.slideWidth, { width }]}>
               <View style={styles.slideContent}>
                 {/* Dynamic Illustration Container */}
                 <View style={styles.illustrationContainer}>
@@ -208,27 +196,30 @@ export default function Onboarding({ navigation }) {
       <View style={styles.dotsWrapper}>
         <View style={styles.dotsContainer}>
           {SLIDES.map((_, index) => {
-            // Since there is a clone at start, the active slide position is shifted by exactly +width.
-            // Active offset for dot at 'index' is (index + 1) * width.
-            const dotPosition = (index + 1) * width;
-            
+            const inputRange = [];
+            const outputRangeWidth = [];
+            const outputRangeColor = [];
+            for (let j = 0; j < SLIDES.length + 2; j++) {
+              inputRange.push(j * width);
+              const slideIndex = (j - 1 + SLIDES.length) % SLIDES.length;
+              if (slideIndex === index) {
+                outputRangeWidth.push(28);
+                outputRangeColor.push(colors.primary);
+              } else {
+                outputRangeWidth.push(10);
+                outputRangeColor.push(colors.border);
+              }
+            }
+
             const dotWidth = scrollX.interpolate({
-              inputRange: [
-                dotPosition - width,
-                dotPosition,
-                dotPosition + width
-              ],
-              outputRange: [10, 28, 10],
+              inputRange,
+              outputRange: outputRangeWidth,
               extrapolate: 'clamp'
             });
 
             const dotColor = scrollX.interpolate({
-              inputRange: [
-                dotPosition - width,
-                dotPosition,
-                dotPosition + width
-              ],
-              outputRange: [colors.border, colors.primary, colors.border],
+              inputRange,
+              outputRange: outputRangeColor,
               extrapolate: 'clamp'
             });
 
