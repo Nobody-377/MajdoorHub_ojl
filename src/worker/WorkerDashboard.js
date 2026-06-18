@@ -9,12 +9,26 @@ export default function WorkerDashboard({ navigation }) {
   const insets = useSafeAreaInsets();
   const [isOnline, setIsOnline] = useState(true);
   const { user, jobs } = useStore();
+  const workerSkill = user?.skill || 'Plumber';
   const activeJobs = (jobs || []).filter(job => job.status === 'accepted');
-  const [newRequests] = useState([
-    { id: 1, title: 'Water tank installation', distance: '2.5 km away', time: 'Today, 2:00 PM', price: '₹600' },
-    { id: 2, title: 'Kitchen sink repair', distance: '4.1 km away', time: 'Tomorrow, 10:00 AM', price: '₹300' },
-    { id: 3, title: 'Full home plumbing check', distance: '1.8 km away', time: 'Tomorrow, 4:00 PM', price: '₹1200' },
-  ]);
+
+  const getFilteredJobsBySkill = () => {
+    const skillNorm = workerSkill.trim().toLowerCase();
+    return (jobs || []).filter(job => {
+      if (!job.category) return true;
+      const catNorm = job.category.trim().toLowerCase();
+      return catNorm.includes(skillNorm) || skillNorm.includes(catNorm) ||
+             (skillNorm === 'plumber' && catNorm === 'plumbing') ||
+             (skillNorm === 'electrician' && catNorm === 'electrical') ||
+             (skillNorm === 'carpenter' && catNorm === 'carpentry') ||
+             (skillNorm === 'painter' && catNorm === 'painting') ||
+             (skillNorm === 'cleaner' && catNorm === 'cleaning');
+    });
+  };
+
+  const skillFiltered = getFilteredJobsBySkill();
+  const pendingRequests = skillFiltered.filter(job => job.status === 'pending');
+  const visibleRequests = pendingRequests.slice(0, 3); // Show top 3 on dashboard
 
   const getInitials = (name) => {
     if (!name) return 'W';
@@ -149,24 +163,30 @@ export default function WorkerDashboard({ navigation }) {
       {/* New Requests Summary */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>New Requests ({newRequests.length})</Text>
+          <Text style={styles.sectionTitle}>New Requests ({pendingRequests.length})</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Jobs')}>
             <Text style={styles.seeAll}>View All</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.requestsContainer}>
-          {newRequests.map(req => (
-            <TouchableOpacity key={req.id} style={styles.requestItem} onPress={() => navigation.navigate('Jobs')}>
-              <View style={styles.requestIconBg}>
-                <Bell size={20} color={colors.surface} />
-              </View>
-              <View style={styles.requestInfo}>
-                <Text style={styles.requestTitle}>{req.title}</Text>
-                <Text style={styles.requestMeta}>{req.distance} • {req.time}</Text>
-              </View>
-              <Text style={styles.requestPrice}>{req.price}</Text>
-            </TouchableOpacity>
-          ))}
+          {visibleRequests.length === 0 ? (
+            <View style={[styles.requestItem, { justifyContent: 'center', paddingVertical: 20 }]}>
+              <Text style={{ color: colors.textSecondary, fontWeight: '500' }}>No pending requests for {workerSkill}.</Text>
+            </View>
+          ) : (
+            visibleRequests.map(req => (
+              <TouchableOpacity key={req.id} style={styles.requestItem} onPress={() => navigation.navigate('Jobs')}>
+                <View style={styles.requestIconBg}>
+                  <Bell size={20} color={colors.surface} />
+                </View>
+                <View style={styles.requestInfo}>
+                  <Text style={styles.requestTitle}>{req.title}</Text>
+                  <Text style={styles.requestMeta}>{req.distance} away • {req.time}</Text>
+                </View>
+                <Text style={styles.requestPrice}>{req.price}</Text>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
       </View>
     </ScrollView>
