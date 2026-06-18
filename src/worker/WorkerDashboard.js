@@ -10,8 +10,6 @@ export default function WorkerDashboard({ navigation }) {
   const [isOnline, setIsOnline] = useState(true);
   const { user, jobs } = useStore();
   const workerSkills = user?.skills && user.skills.length > 0 ? user.skills : [user?.skill || 'Plumber'];
-  const activeJobs = (jobs || []).filter(job => job.status === 'accepted');
-
   const getFilteredJobsBySkill = () => {
     return (jobs || []).filter(job => {
       if (!job.category) return true;
@@ -31,6 +29,7 @@ export default function WorkerDashboard({ navigation }) {
   };
 
   const skillFiltered = getFilteredJobsBySkill();
+  const activeJobs = skillFiltered.filter(job => job.status === 'accepted');
   const pendingRequests = skillFiltered.filter(job => job.status === 'pending');
   const visibleRequests = pendingRequests.slice(0, 3); // Show top 3 on dashboard
 
