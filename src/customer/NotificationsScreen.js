@@ -70,37 +70,25 @@ export default function NotificationsScreen({ navigation }) {
   };
 
   const getIcon = (type) => {
+    const iconColor = colors.primary;
     switch (type) {
       case 'booking':
-        return <Calendar size={20} color="#3B82F6" />;
+        return <Calendar size={20} color={iconColor} />;
       case 'completed':
-        return <CheckCircle size={20} color="#10B981" />;
+        return <CheckCircle size={20} color={iconColor} />;
       case 'offer':
-        return <Percent size={20} color="#F59E0B" />;
+        return <Percent size={20} color={iconColor} />;
       case 'security':
-        return <ShieldAlert size={20} color="#8B5CF6" />;
+        return <ShieldAlert size={20} color={iconColor} />;
       case 'weather':
-        return <CloudRain size={20} color="#0D3B66" />;
+        return <CloudRain size={20} color={iconColor} />;
       default:
-        return <Bell size={20} color={colors.accent} />;
+        return <Bell size={20} color={iconColor} />;
     }
   };
 
-  const getIconBg = (type) => {
-    switch (type) {
-      case 'booking':
-        return '#E0F2FE';
-      case 'completed':
-        return '#D1FAE5';
-      case 'offer':
-        return '#FEF3C7';
-      case 'security':
-        return '#F3E8FF';
-      case 'weather':
-        return '#E0E7FF';
-      default:
-        return `${colors.accent}15`;
-    }
+  const getIconBg = () => {
+    return 'rgba(13, 59, 102, 0.08)'; // Light translucent brand primary (navy)
   };
 
   return (
@@ -204,18 +192,17 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.surface,
     borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: 'rgba(249, 115, 22, 0.25)', // Soft translucent brand orange
+    borderWidth: 1,
+    borderColor: colors.border,
     padding: 16,
-    elevation: 3,
-    shadowColor: colors.accent, // Soft brand-matching glow
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
   },
   unreadCard: {
-    borderWidth: 2,
-    borderColor: colors.accent, // Bold brand orange for unread notifications
-    backgroundColor: 'rgba(249, 115, 22, 0.03)',
+    backgroundColor: 'rgba(249, 115, 22, 0.02)',
+    borderColor: 'rgba(249, 115, 22, 0.3)', // Subtle orange border to emphasize unread status
   },
   cardHeader: {
     flexDirection: 'row',
