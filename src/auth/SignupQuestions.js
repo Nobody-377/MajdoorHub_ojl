@@ -27,7 +27,7 @@ export default function SignupQuestions({ navigation, route }) {
   // Customer-specific states
   const [preferredCategories, setPreferredCategories] = useState([]);
 
-  const totalSteps = role === 'worker' ? 7 : 4;
+  const totalSteps = role === 'worker' ? 7 : 3;
 
   const handleNext = () => {
     if (step < totalSteps) {
@@ -53,7 +53,7 @@ export default function SignupQuestions({ navigation, route }) {
         dailyRate: role === 'worker' ? dailyRate : null,
         experience: role === 'worker' ? experience : null,
         availability: role === 'worker' ? availability : null,
-        preferredCategories: role === 'customer' ? preferredCategories : [],
+        preferredCategories: [],
       });
       setRole(role);
       setAuthenticated(true);
@@ -80,9 +80,8 @@ export default function SignupQuestions({ navigation, route }) {
       return false; // Step 7 (Email) is optional
     } else {
       if (step === 1) return name.trim().length === 0;
-      if (step === 2) return preferredCategories.length === 0;
-      if (step === 3) return !selectedCity;
-      return false; // Step 4 (Email) is optional
+      if (step === 2) return !selectedCity;
+      return false; // Step 3 (Email) is optional
     }
   };
 
@@ -110,9 +109,8 @@ export default function SignupQuestions({ navigation, route }) {
       else if (step === 7) stepType = 'email';
     } else {
       if (step === 1) stepType = 'name';
-      else if (step === 2) stepType = 'preferredCategories';
-      else if (step === 3) stepType = 'city';
-      else if (step === 4) stepType = 'email';
+      else if (step === 2) stepType = 'city';
+      else if (step === 3) stepType = 'email';
     }
 
     switch (stepType) {
