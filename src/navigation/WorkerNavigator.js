@@ -8,6 +8,7 @@ import WorkerDashboard from '../worker/WorkerDashboard';
 import JobRequests from '../worker/JobRequest';
 import ActiveJob from '../worker/ActiveJob';
 import WorkerProfile from '../worker/WorkerProfileEdit';
+import WorkerEarnings from '../worker/WorkerEarnings';
 import NotificationsScreen from '../customer/NotificationsScreen';
 
 import colors from '../utils/colors';
@@ -45,7 +46,7 @@ function WorkerTabs() {
     >
       <Tab.Screen name="Dashboard" component={WorkerDashboard} />
       <Tab.Screen name="Jobs" component={JobRequests} />
-      <Tab.Screen name="Earnings" component={WorkerDashboard} /> 
+      <Tab.Screen name="Earnings" component={WorkerEarnings} /> 
       <Tab.Screen name="Profile" component={WorkerProfile} />
     </Tab.Navigator>
   );
