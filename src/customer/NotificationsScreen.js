@@ -58,10 +58,17 @@ const NOTIFICATIONS = [
 ];
 
 export default function NotificationsScreen({ navigation }) {
+  const [notifications, setNotifications] = useState(NOTIFICATIONS);
   const [expandedId, setExpandedId] = useState(null);
 
   const toggleExpand = (id) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    
+    // Mark notification as read when expanded
+    setNotifications(prev =>
+      prev.map(n => n.id === id ? { ...n, read: true } : n)
+    );
+
     if (expandedId === id) {
       setExpandedId(null);
     } else {
@@ -103,7 +110,7 @@ export default function NotificationsScreen({ navigation }) {
 
       {/* Notifications List */}
       <FlatList
-        data={NOTIFICATIONS}
+        data={notifications}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => {
