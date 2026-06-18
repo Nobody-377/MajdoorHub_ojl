@@ -109,7 +109,7 @@ export default function NotificationsScreen({ navigation }) {
         renderItem={({ item }) => {
           const isExpanded = expandedId === item.id;
           return (
-            <View style={[styles.card, !item.read && styles.unreadCard]}>
+            <View style={styles.card}>
               <View style={styles.cardHeader}>
                 <View style={[styles.iconBg, { backgroundColor: getIconBg(item.type) }]}>
                   {getIcon(item.type)}
@@ -200,10 +200,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.04,
     shadowRadius: 8,
   },
-  unreadCard: {
-    backgroundColor: 'rgba(249, 115, 22, 0.02)',
-    borderColor: 'rgba(249, 115, 22, 0.3)', // Subtle orange border to emphasize unread status
-  },
+
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
