@@ -12,7 +12,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 const NOTIFICATIONS = [
   {
     id: 'n1',
-    title: 'Booking Confirmed! 🎉',
+    title: 'Booking Confirmed!',
     shortDesc: 'Your plumbing booking with Ramesh Kumar is confirmed.',
     fullDesc: 'Your professional plumbing service booking (ID: MH-8429) with Ramesh Kumar has been officially confirmed by the worker. He is scheduled to arrive at Andheri West, Mumbai, on June 01, 2026, at 10:00 AM. Please ensure someone is available at the address. Base rate is ₹400/hr. Contact him via the booking screen if you need to coordinate.',
     date: 'Just now',
@@ -21,7 +21,7 @@ const NOTIFICATIONS = [
   },
   {
     id: 'n2',
-    title: 'Job Marked as Completed! 🌟',
+    title: 'Job Marked as Completed!',
     shortDesc: 'Ramesh Kumar has marked your pipe leakage task as completed.',
     fullDesc: 'The bathroom pipe leakage job has been completed by Ramesh Kumar. Total duration: 2 hours. Please inspect the work, clear the payment of ₹964 (including GST and platform fees), and take a moment to write a review of your experience on his profile to help others in the community.',
     date: '2 hours ago',
@@ -30,7 +30,7 @@ const NOTIFICATIONS = [
   },
   {
     id: 'n3',
-    title: 'Huge Discount: 20% Off! 🎁',
+    title: 'Huge Discount: 20% Off!',
     shortDesc: 'Exclusive discount code for your next home service booking.',
     fullDesc: 'Welcome to MajdoorHub! We are excited to offer you a special 20% discount on your next electrician, plumber, or painter booking. Use code MAZDOOR20 during checkout. This offer is valid till June 15, 2026, for a maximum discount of ₹150. Claim it today and hire high-quality verified labor!',
     date: '1 day ago',
@@ -39,7 +39,7 @@ const NOTIFICATIONS = [
   },
   {
     id: 'n4',
-    title: 'Security Update: 2FA is Live! 🔒',
+    title: 'Security Update: 2FA is Live!',
     shortDesc: 'Protect your account by enabling Two-Factor Authentication.',
     fullDesc: 'Your account security is our top priority. We have launched Two-Factor Authentication (2FA) support. You can now enable 2FA directly from your Profile > Privacy & Security menu to require an OTP code every time you log in to your account. We highly recommend turning this on immediately.',
     date: '3 days ago',
@@ -48,7 +48,7 @@ const NOTIFICATIONS = [
   },
   {
     id: 'n5',
-    title: 'Rainy Season Alert 🌧️',
+    title: 'Rainy Season Alert',
     shortDesc: 'Expect minor delays due to heavy monsoon rains in Mumbai.',
     fullDesc: 'Due to heavy water logging and active monsoon rainfall across Mumbai, our service providers might face transport delays. We recommend booking urgent tasks 1-2 hours in advance. Thank you for your cooperation and understanding! Stay safe!',
     date: '4 days ago',

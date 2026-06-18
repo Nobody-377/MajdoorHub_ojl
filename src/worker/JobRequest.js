@@ -52,7 +52,7 @@ export default function JobRequests({ navigation }) {
     setJobs(prevJobs => 
       prevJobs.map(job => job.id === id ? { ...job, status: 'completed', time: 'Completed Just Now' } : job)
     );
-    Alert.alert('Congratulations! 🎉', 'Job marked as completed. Earnings added to your wallet.');
+    Alert.alert('Congratulations!', 'Job marked as completed. Earnings added to your wallet.');
   };
 
   const handleCall = (name) => {

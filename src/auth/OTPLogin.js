@@ -42,7 +42,7 @@ export default function OTPLogin({ navigation }) {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <View style={styles.header}>
-          <Text style={styles.title}>{isSignUp ? 'Create an Account 🚀' : 'Welcome Back! 👋'}</Text>
+          <Text style={styles.title}>{isSignUp ? 'Create an Account' : 'Welcome Back!'}</Text>
           <Text style={styles.subtitle}>
             {!confirmResult 
               ? (isSignUp ? 'Enter your phone number to sign up' : 'Enter your phone number to log in') 

@@ -115,7 +115,7 @@ export default function SignupQuestions({ navigation, route }) {
         return (
           <View style={styles.stepContainer}>
             <View style={styles.header}>
-              <Text style={styles.title}>What is your name? 👤</Text>
+              <Text style={styles.title}>What is your name?</Text>
               <Text style={styles.subtitle}>Enter your full name so others can identify you on MajdoorHub.</Text>
             </View>
 
@@ -138,7 +138,7 @@ export default function SignupQuestions({ navigation, route }) {
         return (
           <View style={styles.stepContainer}>
             <View style={styles.header}>
-              <Text style={styles.title}>What is your email? 📧</Text>
+              <Text style={styles.title}>What is your email?</Text>
               <Text style={styles.subtitle}>Optional. Enter your email for digital receipts, support, and updates.</Text>
             </View>
 
@@ -163,7 +163,7 @@ export default function SignupQuestions({ navigation, route }) {
         return (
           <View style={styles.stepContainer}>
             <View style={styles.header}>
-              <Text style={styles.title}>Where are you located? 📍</Text>
+              <Text style={styles.title}>Where are you located?</Text>
               <Text style={styles.subtitle}>Select your primary operating city to help us match you with nearby users.</Text>
             </View>
 
@@ -190,7 +190,7 @@ export default function SignupQuestions({ navigation, route }) {
         return (
           <View style={styles.stepContainer}>
             <View style={styles.header}>
-              <Text style={styles.title}>What is your primary skill? 🛠️</Text>
+              <Text style={styles.title}>What is your primary skill?</Text>
               <Text style={styles.subtitle}>Select your specialty so customers can find and hire you.</Text>
             </View>
 
@@ -227,7 +227,7 @@ export default function SignupQuestions({ navigation, route }) {
         return (
           <View style={styles.stepContainer}>
             <View style={styles.header}>
-              <Text style={styles.title}>What are your rates? 💰</Text>
+              <Text style={styles.title}>What are your rates?</Text>
               <Text style={styles.subtitle}>Set your target hourly and daily service rates in Rupees.</Text>
             </View>
             
@@ -271,7 +271,7 @@ export default function SignupQuestions({ navigation, route }) {
         return (
           <View style={styles.stepContainer}>
             <View style={styles.header}>
-              <Text style={styles.title}>How much experience do you have? ⏳</Text>
+              <Text style={styles.title}>How much experience do you have?</Text>
               <Text style={styles.subtitle}>Select your years of working experience in this field.</Text>
             </View>
 
@@ -298,7 +298,7 @@ export default function SignupQuestions({ navigation, route }) {
         return (
           <View style={styles.stepContainer}>
             <View style={styles.header}>
-              <Text style={styles.title}>What is your availability? 📅</Text>
+              <Text style={styles.title}>What is your availability?</Text>
               <Text style={styles.subtitle}>Let us know when you are ready to take on job requests.</Text>
             </View>
 
@@ -325,7 +325,7 @@ export default function SignupQuestions({ navigation, route }) {
         return (
           <View style={styles.stepContainer}>
             <View style={styles.header}>
-              <Text style={styles.title}>What services do you need? 🛠️</Text>
+              <Text style={styles.title}>What services do you need?</Text>
               <Text style={styles.subtitle}>Select one or more categories you are interested in.</Text>
             </View>
 
