@@ -3,10 +3,12 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, ScrollView, 
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Calendar, Clock, MapPin, X, Phone, RefreshCw, Star, Trash2 } from 'lucide-react-native';
 import colors from '../utils/colors';
+import useStore from '../store/useStore';
 
 const MOCK_BOOKINGS = [
   {
     id: 'MH-8429',
+    workerId: 1,
     workerName: 'Ramesh Kumar',
     skill: 'Expert Plumber',
     date: 'June 01, 2026',
@@ -19,6 +21,7 @@ const MOCK_BOOKINGS = [
   },
   {
     id: 'MH-7104',
+    workerId: 2,
     workerName: 'Suresh Singh',
     skill: 'Master Electrician',
     date: 'May 28, 2026',
@@ -31,6 +34,7 @@ const MOCK_BOOKINGS = [
   },
   {
     id: 'MH-5201',
+    workerId: 3,
     workerName: 'Amit Sharma',
     skill: 'Professional Painter',
     date: 'May 15, 2026',
@@ -388,6 +392,20 @@ export default function BookingsScreen({ navigation }) {
                       Alert.alert('Required', 'Please write a review comment.');
                       return;
                     }
+
+                    // Save review globally in Zustand store
+                    const { user, addReview } = useStore.getState();
+                    const customerName = user?.name || 'Anonymous';
+                    const newReview = {
+                      id: `rev-${Date.now()}`,
+                      workerId: selectedBooking.workerId || 1,
+                      customerName,
+                      rating: reviewRating,
+                      text: reviewText.trim(),
+                      date: 'Just now'
+                    };
+                    addReview(newReview);
+
                     Alert.alert(
                       'Review Submitted',
                       `Thank you for reviewing ${selectedBooking.workerName}! Your feedback helps maintain high-quality service providers on MajdoorHub.`,

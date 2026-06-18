@@ -4,11 +4,15 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ChevronLeft, Heart, Star, Phone, MessageCircle, ShieldCheck, Clock, ThumbsUp } from 'lucide-react-native';
 import colors from '../utils/colors';
 import { MOCK_WORKERS } from '../utils/mockData';
+import useStore from '../store/useStore';
 
 export default function WorkerProfile({ navigation, route }) {
   const insets = useSafeAreaInsets();
   const workerId = route.params?.id || 1;
   const worker = MOCK_WORKERS.find(w => w.id === workerId) || MOCK_WORKERS[0];
+  const { reviews } = useStore();
+
+  const workerReviews = (reviews || []).filter(r => r.workerId === workerId);
 
   return (
     <View style={styles.container}>
@@ -94,6 +98,41 @@ export default function WorkerProfile({ navigation, route }) {
                 <Text style={styles.pricingVal}>{worker.dailyRate}</Text>
               </View>
             </View>
+          </View>
+
+          {/* Reviews Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Reviews ({workerReviews.length})</Text>
+            {workerReviews.length === 0 ? (
+              <Text style={styles.noReviewsText}>No reviews yet. Be the first to leave one!</Text>
+            ) : (
+              <View style={styles.reviewsList}>
+                {workerReviews.map((rev) => (
+                  <View key={rev.id} style={styles.reviewCard}>
+                    <View style={styles.reviewHeader}>
+                      <View style={styles.reviewAuthorBg}>
+                        <Text style={styles.reviewAuthorInitial}>{rev.customerName.charAt(0)}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.reviewAuthorName}>{rev.customerName}</Text>
+                        <Text style={styles.reviewDate}>{rev.date}</Text>
+                      </View>
+                      <View style={styles.reviewStarsRow}>
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star
+                            key={s}
+                            size={12}
+                            color={s <= rev.rating ? colors.warning : colors.border}
+                            fill={s <= rev.rating ? colors.warning : 'transparent'}
+                          />
+                        ))}
+                      </View>
+                    </View>
+                    <Text style={styles.reviewBody}>{rev.text}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -296,5 +335,61 @@ const styles = StyleSheet.create({
     color: colors.surface,
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  noReviewsText: {
+    fontSize: 14,
+    color: colors.textLight,
+    fontStyle: 'italic',
+    paddingVertical: 8,
+  },
+  reviewsList: {
+    gap: 12,
+    marginTop: 8,
+  },
+  reviewCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 14,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  reviewAuthorBg: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(13, 59, 102, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reviewAuthorInitial: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: colors.primary,
+  },
+  reviewAuthorName: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: colors.text,
+  },
+  reviewDate: {
+    fontSize: 11,
+    color: colors.textLight,
+    marginTop: 1,
+  },
+  reviewStarsRow: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  reviewBody: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    lineHeight: 18,
+    paddingLeft: 4,
   },
 });

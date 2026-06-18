@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform, Image, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Camera, LogOut, Eye, Trash2, Image as ImageIcon, Check } from 'lucide-react-native';
+import { Camera, LogOut, Eye, Trash2, Image as ImageIcon, Check, Star } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import colors from '../utils/colors';
 import useStore from '../store/useStore';
 
 export default function WorkerProfileEdit() {
-  const { setAuthenticated, setRole, user, setUser } = useStore();
+  const { setAuthenticated, setRole, user, setUser, reviews } = useStore();
   const [name, setName] = useState(user?.name || 'Ramesh Kumar');
   const [phone, setPhone] = useState(user?.phone || '+91 98765 43210');
+
+  const workerId = user?.id || 1; 
+  const myReviews = (reviews || []).filter(r => r.workerId === workerId);
   
   const getInitialSkills = () => {
     if (user?.skills && user.skills.length > 0) return user.skills;
@@ -285,6 +288,41 @@ export default function WorkerProfileEdit() {
         <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
           <Text style={styles.saveBtnText}>Save Changes</Text>
         </TouchableOpacity>
+
+        <View style={styles.divider} />
+
+        {/* Customer Reviews Section for the Labor themselves */}
+        <Text style={styles.sectionTitle}>Reviews from Customers ({myReviews.length})</Text>
+        {myReviews.length === 0 ? (
+          <Text style={styles.noReviewsText}>No reviews received yet.</Text>
+        ) : (
+          <View style={styles.reviewsList}>
+            {myReviews.map((rev) => (
+              <View key={rev.id} style={styles.reviewCard}>
+                <View style={styles.reviewHeader}>
+                  <View style={styles.reviewAuthorBg}>
+                    <Text style={styles.reviewAuthorInitial}>{rev.customerName.charAt(0)}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.reviewAuthorName}>{rev.customerName}</Text>
+                    <Text style={styles.reviewDate}>{rev.date}</Text>
+                  </View>
+                  <View style={styles.reviewStarsRow}>
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star
+                        key={s}
+                        size={12}
+                        color={s <= rev.rating ? colors.warning : colors.border}
+                        fill={s <= rev.rating ? colors.warning : 'transparent'}
+                      />
+                    ))}
+                  </View>
+                </View>
+                <Text style={styles.reviewBody}>{rev.text}</Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         <View style={styles.divider} />
 
@@ -630,5 +668,62 @@ const styles = StyleSheet.create({
   },
   categoryCardTextSelected: {
     color: colors.surface,
+  },
+  noReviewsText: {
+    fontSize: 14,
+    color: colors.textLight,
+    fontStyle: 'italic',
+    paddingVertical: 8,
+  },
+  reviewsList: {
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  reviewCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 14,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  reviewAuthorBg: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(13, 59, 102, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reviewAuthorInitial: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: colors.primary,
+  },
+  reviewAuthorName: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: colors.text,
+  },
+  reviewDate: {
+    fontSize: 11,
+    color: colors.textLight,
+    marginTop: 1,
+  },
+  reviewStarsRow: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  reviewBody: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    lineHeight: 18,
+    paddingLeft: 4,
   },
 });

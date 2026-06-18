@@ -57,6 +57,12 @@ const defaultJobs = [
   { id: 73, title: 'Package delivery assistance', customer: 'Varun Dhawan', distance: '2.7 km', time: 'Yesterday, 5:00 PM', price: '₹300', status: 'completed', address: 'Praneta Apartments, Juhu', category: 'Other' },
 ];
 
+const defaultReviews = [
+  { id: 'rev-1', workerId: 1, customerName: 'Amit Patel', rating: 5, text: 'Ramesh was extremely professional and fixed our water tank issue very quickly. Highly recommended!', date: 'May 30, 2026' },
+  { id: 'rev-2', workerId: 1, customerName: 'Suresh Mehta', rating: 4, text: 'Good quality plumbing work. Arrived on time.', date: 'May 24, 2026' },
+  { id: 'rev-3', workerId: 2, customerName: 'Karan Johar', rating: 5, text: 'Suresh did a fantastic job with the smart switchboards. Very clean wiring work.', date: 'May 29, 2026' },
+];
+
 const useStore = create(
   persist(
     (set, get) => ({
@@ -94,6 +100,13 @@ const useStore = create(
       declineJob: (id) => set((state) => ({
         jobs: state.jobs.filter((j) => j.id !== id)
       })),
+
+      // Global Reviews State
+      reviews: defaultReviews,
+      setReviews: (reviews) => set({ reviews }),
+      addReview: (review) => set((state) => ({
+        reviews: [review, ...(state.reviews || [])]
+      })),
     }),
     {
       name: 'user-auth-storage',
@@ -104,6 +117,10 @@ const useStore = create(
           // If the hydrated state has an empty or missing jobs list, populate it with our defaults
           if (!state.jobs || state.jobs.length === 0) {
             state.setJobs(defaultJobs);
+          }
+          // Populate reviews default if missing
+          if (!state.reviews || state.reviews.length === 0) {
+            state.setReviews(defaultReviews);
           }
         }
       },
