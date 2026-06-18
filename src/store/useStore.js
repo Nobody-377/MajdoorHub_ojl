@@ -12,8 +12,12 @@ const useStore = create(
           set({ user });
           return;
         }
+        const currentUser = get().user;
         const currentLogs = get().usersLogs || [];
-        const cleanedLogs = currentLogs.filter((u) => u.phone !== user.phone);
+        const cleanedLogs = currentLogs.filter((u) => 
+          u.phone !== user.phone && 
+          (!currentUser || u.phone !== currentUser.phone)
+        );
         set({
           user,
           usersLogs: [...cleanedLogs, user]
