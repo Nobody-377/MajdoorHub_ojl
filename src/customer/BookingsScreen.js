@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, ScrollView, Alert, TextInput } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Calendar, Clock, MapPin, X, Phone, RefreshCw, Star, Trash2 } from 'lucide-react-native';
 import colors from '../utils/colors';
@@ -47,6 +47,9 @@ export default function BookingsScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('All'); // 'All' | 'Active' | 'Completed'
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isReviewVisible, setIsReviewVisible] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewText, setReviewText] = useState('');
 
   const filteredBookings = MOCK_BOOKINGS.filter(booking => {
     if (activeTab === 'All') return true;
@@ -290,7 +293,11 @@ export default function BookingsScreen({ navigation }) {
                       </TouchableOpacity>
                       <TouchableOpacity 
                         style={styles.reviewButton}
-                        onPress={() => Alert.alert('Leave Review', 'Feedback forms coming soon!')}
+                        onPress={() => {
+                          setReviewRating(5);
+                          setReviewText('');
+                          setIsReviewVisible(true);
+                        }}
                       >
                         <Star size={18} color={colors.accent} fill={colors.accent} />
                         <Text style={styles.reviewButtonText}>Write a Review</Text>
@@ -298,6 +305,101 @@ export default function BookingsScreen({ navigation }) {
                     </>
                   )}
                 </View>
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Feedback/Review Form Modal */}
+      <Modal
+        visible={isReviewVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsReviewVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContainer, { paddingBottom: 24 }]}>
+            {/* Modal Header */}
+            <View style={styles.modalHeaderHeader}>
+              <Text style={styles.modalHeaderTitle}>Write a Review</Text>
+              <TouchableOpacity style={styles.closeBtn} onPress={() => setIsReviewVisible(false)}>
+                <X size={22} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {selectedBooking && (
+              <ScrollView contentContainerStyle={styles.modalScroll}>
+                <Text style={styles.reviewSubtitle}>
+                  How was your experience with <Text style={{ fontWeight: 'bold' }}>{selectedBooking.workerName}</Text>?
+                </Text>
+
+                {/* Interactive Stars Row */}
+                <View style={styles.starsRow}>
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const isFilled = star <= reviewRating;
+                    return (
+                      <TouchableOpacity
+                        key={star}
+                        activeOpacity={0.7}
+                        onPress={() => setReviewRating(star)}
+                        style={styles.starBtn}
+                      >
+                        <Star
+                          size={40}
+                          color={isFilled ? colors.accent : colors.textLight}
+                          fill={isFilled ? colors.accent : 'transparent'}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                {/* Rating Label */}
+                <Text style={styles.ratingLabelText}>
+                  {reviewRating === 5 ? 'Excellent!' :
+                   reviewRating === 4 ? 'Good' :
+                   reviewRating === 3 ? 'Average' :
+                   reviewRating === 2 ? 'Poor' : 'Very Poor'}
+                </Text>
+
+                {/* Review Text Input */}
+                <Text style={styles.sectionHeading}>Review Description</Text>
+                <TextInput
+                  style={styles.reviewTextInput}
+                  placeholder="Tell us about the worker's quality of work, punctuality, and behavior..."
+                  placeholderTextColor={colors.textLight}
+                  multiline
+                  numberOfLines={4}
+                  value={reviewText}
+                  onChangeText={setReviewText}
+                />
+
+                {/* Submit Button */}
+                <TouchableOpacity
+                  style={styles.submitReviewBtn}
+                  onPress={() => {
+                    if (reviewText.trim().length === 0) {
+                      Alert.alert('Required', 'Please write a review comment.');
+                      return;
+                    }
+                    Alert.alert(
+                      'Review Submitted',
+                      `Thank you for reviewing ${selectedBooking.workerName}! Your feedback helps maintain high-quality service providers on MajdoorHub.`,
+                      [
+                        {
+                          text: 'OK',
+                          onPress: () => {
+                            setIsReviewVisible(false);
+                            setSelectedBooking(null);
+                          }
+                        }
+                      ]
+                    );
+                  }}
+                >
+                  <Text style={styles.submitReviewBtnText}>Submit Review</Text>
+                </TouchableOpacity>
               </ScrollView>
             )}
           </View>
@@ -655,6 +757,52 @@ const styles = StyleSheet.create({
   },
   reviewButtonText: {
     color: colors.accent,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  reviewSubtitle: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  starsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 10,
+  },
+  starBtn: {
+    padding: 4,
+  },
+  ratingLabelText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.accent,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  reviewTextInput: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 16,
+    padding: 16,
+    height: 120,
+    fontSize: 15,
+    color: colors.text,
+    textAlignVertical: 'top',
+    marginBottom: 24,
+  },
+  submitReviewBtn: {
+    backgroundColor: colors.accent,
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+  submitReviewBtnText: {
+    color: colors.surface,
     fontSize: 16,
     fontWeight: 'bold',
   },
