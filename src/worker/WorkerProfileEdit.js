@@ -31,7 +31,7 @@ export default function WorkerProfileEdit() {
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+
     if (status !== 'granted') {
       Alert.alert('Permission Denied', 'We need camera roll permissions to upload your profile photo.');
       return;
@@ -71,7 +71,7 @@ export default function WorkerProfileEdit() {
       <View style={styles.header}>
         <Text style={styles.title}>Edit Profile</Text>
       </View>
-      
+
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.avatarSection}>
           <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
@@ -135,7 +135,7 @@ export default function WorkerProfileEdit() {
         </View>
 
         <Text style={styles.sectionTitle}>Pricing Details</Text>
-        
+
         <View style={styles.priceRow}>
           <View style={[styles.inputGroup, { flex: 1 }]}>
             <Text style={styles.label}>Hourly Rate (₹)</Text>

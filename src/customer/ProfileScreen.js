@@ -27,7 +27,7 @@ export default function ProfileScreen() {
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+
     if (status !== 'granted') {
       Alert.alert('Permission Denied', 'We need camera roll permissions to upload your profile photo.');
       return;
@@ -142,8 +142,8 @@ export default function ProfileScreen() {
       'WARNING: This will permanently delete your account and all booking history. This action cannot be undone. Do you want to proceed?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete Permanently', 
+        {
+          text: 'Delete Permanently',
           style: 'destructive',
           onPress: () => {
             setActiveModal(null);
@@ -162,7 +162,7 @@ export default function ProfileScreen() {
         return (
           <ScrollView contentContainerStyle={styles.modalScroll}>
             <Text style={styles.modalDesc}>Update your account personal information below.</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Full Name</Text>
               <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Enter your name" />
@@ -213,7 +213,7 @@ export default function ProfileScreen() {
         return (
           <ScrollView contentContainerStyle={styles.modalScroll}>
             <Text style={styles.modalDesc}>Manage your primary service locations.</Text>
-            
+
             {addresses.map(addr => (
               <View key={addr.id} style={styles.addressCard}>
                 <View style={styles.addressHeader}>
@@ -227,7 +227,7 @@ export default function ProfileScreen() {
             {showAddAddressForm ? (
               <View style={styles.addAddressForm}>
                 <Text style={styles.formTitle}>Add New Address</Text>
-                
+
                 <View style={styles.typeSelectorRow}>
                   {['Home', 'Work', 'Other'].map(type => (
                     <TouchableOpacity
@@ -273,7 +273,7 @@ export default function ProfileScreen() {
         return (
           <ScrollView contentContainerStyle={styles.modalScroll}>
             <Text style={styles.modalDesc}>Select or configure your preferred payment methods.</Text>
-            
+
             <Text style={styles.subSectionTitle}>UPI & Wallets</Text>
             <View style={styles.paymentCard}>
               <Text style={styles.paymentName}>Google Pay / PhonePe UPI</Text>
@@ -297,7 +297,7 @@ export default function ProfileScreen() {
         return (
           <ScrollView contentContainerStyle={styles.modalScroll}>
             <Text style={styles.modalDesc}>How can we assist you today? Get in touch with our team.</Text>
-            
+
             <View style={styles.supportCard}>
               <Text style={styles.supportTitle}>FAQs</Text>
               <Text style={styles.supportBody}>• How long does it take for a worker to arrive?</Text>
@@ -321,7 +321,7 @@ export default function ProfileScreen() {
         return (
           <ScrollView contentContainerStyle={styles.modalScroll} showsVerticalScrollIndicator={false}>
             <Text style={styles.modalDesc}>Configure your app security, account protection, and data access preferences.</Text>
-            
+
             {/* Account Protection section */}
             <Text style={styles.subSectionTitle}>Account Security</Text>
 
@@ -350,7 +350,7 @@ export default function ProfileScreen() {
                 </View>
                 <ChevronRight size={18} color={colors.textLight} style={{ transform: [{ rotate: showPasswordChange ? '90deg' : '0deg' }] }} />
               </TouchableOpacity>
-              
+
               {showPasswordChange && (
                 <View style={styles.accordionBody}>
                   <View style={styles.inputGroup}>
@@ -414,7 +414,7 @@ export default function ProfileScreen() {
         return (
           <View style={styles.modalScroll}>
             <Text style={styles.modalDesc}>Share the app with your family and friends. When they complete their first booking, both of you get ₹100 credit!</Text>
-            
+
             <View style={styles.referralBox}>
               <Text style={styles.referralLabel}>Your Referral Code</Text>
               <Text style={styles.referralCode}>MAZDOOR100</Text>
