@@ -59,6 +59,7 @@ export default function Onboarding({ navigation }) {
   const animationTimeoutRef = useRef(null);
   const isDragging = useRef(false);
   const isInitialized = useRef(false);
+  const lastWidthRef = useRef(width);
 
   const virtualSlides = [
     SLIDES[SLIDES.length - 1],
@@ -123,12 +124,13 @@ export default function Onboarding({ navigation }) {
   };
 
   const handleLayout = () => {
-    if (width > 0) {
+    if (width > 0 && (!isInitialized.current || lastWidthRef.current !== width)) {
       scrollViewRef.current?.scrollTo({
         x: (currentIndexRef.current + 1) * width,
         animated: false,
       });
       isInitialized.current = true;
+      lastWidthRef.current = width;
     }
   };
 
