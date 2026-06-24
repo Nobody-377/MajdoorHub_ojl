@@ -83,7 +83,7 @@ export default function Onboarding({ navigation }) {
         animated: true,
       });
       
-      if (Platform.OS === 'android') {
+      if (Platform.OS !== 'ios') {
         animationTimeoutRef.current = setTimeout(() => {
           handleScrollEnd(nextVirtualIndex * width);
         }, 500);
