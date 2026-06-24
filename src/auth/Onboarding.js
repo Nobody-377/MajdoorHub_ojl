@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, useWindowDimensions, Platform } from 'react-native';
 import { 
   Search, 
   ShieldCheck, 
@@ -56,6 +56,7 @@ export default function Onboarding({ navigation }) {
   const scrollX = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef(null);
   const timerRef = useRef(null);
+  const animationTimeoutRef = useRef(null);
   const isDragging = useRef(false);
   const isInitialized = useRef(false);
 
@@ -80,12 +81,23 @@ export default function Onboarding({ navigation }) {
         x: nextVirtualIndex * width,
         animated: true,
       });
+      
+      if (Platform.OS === 'android') {
+        animationTimeoutRef.current = setTimeout(() => {
+          handleScrollEnd(nextVirtualIndex * width);
+        }, 500);
+      }
     }, 2500);
   };
 
   const stopAutoSlide = () => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = null;
     }
   };
 
@@ -110,7 +122,7 @@ export default function Onboarding({ navigation }) {
     }
   };
 
-  useEffect(() => {
+  const handleLayout = () => {
     if (width > 0) {
       scrollViewRef.current?.scrollTo({
         x: (currentIndexRef.current + 1) * width,
@@ -118,7 +130,7 @@ export default function Onboarding({ navigation }) {
       });
       isInitialized.current = true;
     }
-  }, [width]);
+  };
 
   useEffect(() => {
     startAutoSlide();
@@ -162,6 +174,7 @@ export default function Onboarding({ navigation }) {
           isDragging.current = false;
           startAutoSlide();
         }}
+        onLayout={handleLayout}
         contentContainerStyle={styles.scrollContent}
       >
         {virtualSlides.map((slide, idx) => {
