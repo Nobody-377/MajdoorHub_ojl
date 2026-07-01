@@ -23,7 +23,7 @@ export default function RoleSelection({ navigation, route }) {
           role: selectedRole,
           phone: formattedPhone,
           name: selectedRole === 'worker' ? 'Your name' : 'null',
-          email: 'nandini@example.com',
+          email: 'guest@example.com',
           location: 'Mumbai',
           skill: selectedRole === 'worker' ? 'null' : null,
           hourlyRate: selectedRole === 'worker' ? 'null' : null,

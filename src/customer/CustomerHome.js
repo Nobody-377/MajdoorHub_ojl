@@ -63,7 +63,7 @@ export default function CustomerHome({ navigation }) {
                   {user?.profileImage ? (
                     <Image source={{ uri: user.profileImage }} style={styles.avatarImage} />
                   ) : (
-                    <Text style={styles.avatarText}>{getInitials(user?.name || 'Nandini Patel')}</Text>
+                    <Text style={styles.avatarText}>{getInitials(user?.name || 'Guest User')}</Text>
                   )}
                 </View>
               </TouchableOpacity>

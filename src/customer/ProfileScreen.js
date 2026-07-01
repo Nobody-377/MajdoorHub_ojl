@@ -12,9 +12,9 @@ export default function ProfileScreen() {
   const [activeModal, setActiveModal] = useState(null);
 
   // Form states for Edit Profile
-  const [name, setName] = useState(user?.name || 'Nandini Patel');
+  const [name, setName] = useState(user?.name || 'Guest User');
   const [phone, setPhone] = useState(user?.phone || '+91 98765 43210');
-  const [email, setEmail] = useState(user?.email || 'nandini@example.com');
+  const [email, setEmail] = useState(user?.email || 'guest@example.com');
   const [preferredCategories, setPreferredCategories] = useState(user?.preferredCategories || []);
   const [profileImage, setProfileImage] = useState(user?.profileImage || null);
   const [isViewImageVisible, setIsViewImageVisible] = useState(false);
@@ -335,13 +335,13 @@ export default function ProfileScreen() {
             <Text style={styles.subSectionTitle}>UPI & Wallets</Text>
             <View style={styles.paymentCard}>
               <Text style={styles.paymentName}>Google Pay / PhonePe UPI</Text>
-              <Text style={styles.paymentDetails}>nandini@okaxis</Text>
+              <Text style={styles.paymentDetails}>guest@okaxis</Text>
             </View>
 
             <Text style={styles.subSectionTitle}>Cards</Text>
             <View style={styles.paymentCard}>
               <Text style={styles.paymentName}>HDFC Bank Credit Card</Text>
-              <Text style={styles.paymentDetails}>•••• •••• •••• 4892</Text>
+              <Text style={styles.paymentDetails}>•••• •••• •••• 1234</Text>
             </View>
 
             <TouchableOpacity style={styles.outlineBtn} onPress={() => Alert.alert('Add Payment', 'Add payment service coming soon!')}>
